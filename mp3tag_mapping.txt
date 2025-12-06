@@ -1,0 +1,40 @@
+===================================================================
+INSTRUKCJA IMPORTU METADANYCH DO MP3TAG
+===================================================================
+
+Twoja aplikacja "Music Metadata Engine" generuje pliki CSV w określonym formacie. 
+Aby zaimportować te dane do plików MP3/WAV w programie Mp3tag, wykonaj poniższe kroki:
+
+1. Otwórz program Mp3tag.
+2. Wczytaj pliki audio, które analizowałeś (upewnij się, że nazwy plików są identyczne jak w momencie analizy).
+3. Zaznacz wszystkie pliki na liście (Ctrl+A).
+4. W menu wybierz: "Konwertuj" -> "Plik tekstowy - Znacznik" (Skrót: Alt+4).
+5. Wybierz plik .csv wygenerowany przez aplikację.
+6. W polu "Format string" (Ciąg formatujący) wklej poniższy kod (w jednej linii):
+
+%_filename%,%title%,%artist%,%album%,%year%,%MAIN_INSTRUMENT%,%initialkey%,%MODE%,%bpm%,%dummy%,%TEMPO_CHARACTER%,%ENERGY_LEVEL%,%genre%,%SUBGENRE%,%comment%,%KEYWORDS%,%copyright%,%publisher%,%composer%,%lyricist%,%albumartist%,%CATALOGNUMBER%,%isrc%,%MOOD%,%INSTRUMENTATION%,%VOCAL_GENDER%,%VOCAL_TIMBRE%,%VOCAL_DELIVERY%,%VOCAL_TONE%,%USAGE%,%STRUCTURE%
+
+===================================================================
+LEGENDA PÓL (Co trafi gdzie?):
+===================================================================
+%_filename%       -> Dopasowanie po nazwie pliku (Kluczowe!)
+%title%           -> Tytuł
+%artist%          -> Artysta
+%album%           -> Album
+%year%            -> Rok
+%initialkey%      -> Tonacja (np. Cm)
+%bpm%             -> Tempo
+%genre%           -> Główny Gatunek
+%comment%         -> Opis utworu (Bio)
+%copyright%       -> Prawa autorskie
+%publisher%       -> Wydawca
+%isrc%            -> Kod ISRC
+%catalog%         -> Nr Katalogowy
+
+Pola niestandardowe (widoczne w panelu "Rozszerzone tagi" Alt+T):
+%MOOD%            -> Nastroje
+%KEYWORDS%        -> Słowa kluczowe
+%SUBGENRE%        -> Podgatunki
+%INSTRUMENTATION% -> Lista instrumentów
+%USAGE%           -> Sugerowane użycie (Sync)
+...i inne.

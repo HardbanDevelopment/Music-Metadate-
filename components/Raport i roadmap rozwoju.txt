@@ -1,0 +1,121 @@
+Dokumentacja Projektowa: Music Metadata Engine (MME)
+Wersja Dokumentu: 1.0 – Master Architecture & Business Case
+Data: Październik 2023
+Autor: Główny Architekt Systemowy / Senior Business Analyst
+Klasyfikacja: Strategiczna / Techniczna
+I. Wprowadzenie i Kontekst Rynkowy
+1.1 Definicja Produktu
+Music Metadata Engine (MME) to nie jest kolejny edytor tagów ID3. To zaawansowany, modułowy ekosystem oparty na algorytmach uczenia maszynowego (Machine Learning) i cyfrowego przetwarzania sygnałów (DSP), zaprojektowany w celu automatyzacji procesu Ingestii, Analizy i Wzbogacania cyfrowych aktywów audio.
+MME to system klasy "Middleware", który operuje na styku twórcy (producenta, wytwórni) a dystrybutora (DSP – Digital Service Provider, Biblioteki Sync). Jego podstawowym zadaniem jest przekształcenie surowego pliku audio (.wav, .mp3) w "inteligentny zasób cyfrowy" – plik, który niesie ze sobą nie tylko dźwięk, ale kompletny, znormalizowany i prawnie zweryfikowany zestaw metadanych osadzonych bezpośrednio w kontenerze ID3v2.4.
+1.2 Problem Rynkowy: "The Metadata Gap"
+W erze cyfrowej, metadane to waluta. Jednakże branża muzyczna cierpi na chroniczny problem nazywany "The Metadata Gap" lub "Black Box Royalties".
+Straty Finansowe: Szacuje się, że miliardy dolarów rocznie w tantiemach nie trafiają do twórców z powodu błędnych lub brakujących metadanych (np. brak kodu ISRC, błędnie wpisani autorzy).
+Odrzucenia przez DSP: Platformy takie jak Spotify czy Apple Music mają rygorystyczne standardy (np. standard DDEX). Pliki z niekompletnymi tagami są odrzucane lub trafiają do "czarnej dziury" niewypłaconych środków.
+Problem Odkrywalności (Discoverability): W bibliotekach typu Production Music (muzyka do reklam/filmów), utwór bez precyzyjnych tagów nastroju (np. "Melancholijny", "Kinowy") jest niewidoczny dla wyszukiwarek, a tym samym – niesprzedawalny.
+Obecne rozwiązania rynkowe są spolaryzowane: mamy proste, manualne edytory (np. Mp3tag), które wymagają ogromnego nakładu pracy ludzkiej, lub bardzo drogie systemy Enterprise niedostępne dla mniejszych podmiotów. MME wypełnia tę lukę.
+1.3 Unikalna Propozycja Wartości (UVP)
+MME buduje swoją przewagę konkurencyjną na trzech filarach technologicznych:
+Architektura Zorientowana na ID3v2.4: Większość systemów zatrzymuje się na standardowych polach (Artysta, Tytuł). MME natywnie obsługuje i wymusza wypełnienie ponad 40 pól, w tym zaawansowanych ramek niestandardowych TXXX (dla specyficznych atrybutów jak Główny Instrument) oraz WXXX (linki do licencji). System traktuje plik audio jak bazę danych.
+Głęboka Analiza Kontekstowa AI: Wykorzystujemy sieci neuronowe nie tylko do prostego wykrywania gatunku, ale do "rozumienia" utworu. Nasze modele klasyfikują subiektywne atrybuty – Nastrój (Mood), Energię, Stylistykę – i zapisują je w tagach, co jest kluczowe dla branży Sync Licensing.
+Automatyczna Walidacja Prawna i Cyfrowa: System posiada wbudowane mechanizmy "Safety Checks". Nie pozwoli na eksport pliku, jeśli wykryje konflikt w kodzie ISRC lub brak rozróżnienia między właścicielem nagrania (Master Rights) a właścicielem kompozycji (Publishing Rights).
+II. Architektura i Stos Technologiczny (Technical Deep Dive)
+Aby zapewnić skalowalność, niezawodność i szybkość przetwarzania, MME zostało zaprojektowane w oparciu o architekturę mikroserwisową z asynchronicznym przetwarzaniem zadań.
+2.1 Backend i Logika Kontrolna
+API Framework: Python FastAPI
+Uzasadnienie: Wybór FastAPI nie jest przypadkowy. Jego natywna obsługa asynchroniczności (async/await) jest krytyczna przy obsłudze operacji I/O (przesyłanie dużych plików audio). FastAPI oferuje również automatyczną dokumentację (OpenAPI/Swagger) i walidację typów (Pydantic), co drastycznie przyspiesza rozwój i integrację z frontendem. Jest to obecnie standard branżowy dla wysokowydajnych API w Pythonie.
+Kolejkowanie Zadań: Celery z Redis/RabbitMQ
+Uzasadnienie: Analiza audio (ML/MIR) jest procesem kosztownym obliczeniowo. Przetworzenie jednego utworu może trwać od kilku do kilkunastu sekund. W scenariuszu wsadowym (użytkownik wgrywa 500 plików), synchroniczne przetwarzanie zablokowałoby serwer.
+Rola: API przyjmuje plik i natychmiast zwraca ID zadania (task_id). Celery, działając w tle (worker nodes), pobiera zadania z brokera (Redis) i uruchamia ciężkie procesy analizy. Pozwala to na poziome skalowanie – możemy dodać więcej workerów bez zmiany kodu API.
+Silnik ID3: Python mutagen
+Uzasadnienie: Biblioteka mutagen jest "złotym standardem" w ekosystemie Pythona do obsługi metadanych audio.
+Kluczowa Rola: mutagen bezbłędnie obsługuje standard ID3v2.4 (w tym kodowanie UTF-8, które jest problematyczne w starszych bibliotekach) oraz pozwala na swobodne tworzenie i odczytywanie ramek niestandardowych TXXX, co jest sercem funkcjonalności MME. Inne biblioteki często "gubią" niestandardowe ramki przy zapisie.
+Baza Danych: Google Firestore (NoSQL)
+Uzasadnienie: Metadane muzyczne są z natury hierarchiczne i często nieustrukturyzowane (zmienna liczba tagów, różne schematy dla różnych gatunków). Relacyjna baza danych (SQL) byłaby tu zbyt sztywna.
+Rola: Firestore przechowuje historię analiz, "snaphoty" metadanych przed i po edycji oraz stany sesji wsadowych. Pozwala to na szybkie wyszukiwanie i odtwarzanie stanu pracy użytkownika w czasie rzeczywistym (Real-time updates).
+2.2 Moduł Analizy Audio i AI (Processing Plane)
+To jest "mózg" systemu, odpowiedzialny za ekstrakcję informacji z surowego sygnału audio.
+Technologie Bazowe:
+Librosa: Biblioteka do analizy sygnałów audio. Używana do ekstrakcji cech niskopoziomowych (spectral centroid, zero-crossing rate) niezbędnych do obliczeń BPM i Tonacji.
+TensorFlow / PyTorch: Frameworki do obsługi wytrenowanych modeli głębokiego uczenia (Deep Learning), używane do klasyfikacji wysokopoziomowej (gatunek, nastrój).
+Przepływ Danych (Pipeline):
+Dekodowanie: Plik audio jest konwertowany do surowego formatu PCM (często z downsamplingiem do 22050 Hz dla przyspieszenia analizy ML).
+Ekstrakcja Cech (Feature Extraction): Generowanie spektrogramów Mel i wektorów cech.
+Inferencja (Inference): Dane trafiają do modeli ML, które zwracają wektory prawdopodobieństwa (np. 80% Happy, 20% Energetic).
+III. Szczegółowy Opis Funkcji Silnika (The Engine's Core Capabilities)
+W tej sekcji mapujemy funkcjonalności biznesowe na konkretne, techniczne implementacje standardu ID3.
+3.1 Moduł Audio Intelligence (AI) – "Słuch Absolutny"
+Ten moduł eliminuje konieczność ręcznego odsłuchu w celu określenia parametrów technicznych i estetycznych.
+Analiza Metryczna (BPM & Key):
+System analizuje transjenty (uderzenia) i strukturę harmoniczną.
+Mapowanie ID3:
+Tempo trafia do ramki TBPM (znormalizowane do liczb całkowitych dla kompatybilności).
+Tonacja trafia do ramki TKEY (zgodnie z notacją Camelot lub standardową, np. "C#m").
+Studium przypadku: Dla DJ-ów, poprawność TBPM i TKEY jest krytyczna przy miksowaniu harmonicznym. Błąd MME poniżej 2% eliminuje potrzebę używania zewnętrznego softu jak Mixed In Key.
+Klasyfikacja Nastroju (Mood):
+To najtrudniejszy element AI. Model analizuje dynamikę, barwę dźwięku i harmonię, aby przypisać deskryptory emocjonalne.
+Mapowanie ID3: Standard ID3 nie ma dedykowanej ramki "Mood". MME wykorzystuje ramkę niestandardową TXXX z opisem Mood.
+Wartość: W bibliotekach muzycznych (Sync), edytorzy wideo szukają muzyki po nastroju ("Sad", "Uplifting"). Automatyzacja tego procesu zwiększa szansę na sprzedaż licencji.
+Optymalizacja SEO (Hashtagi):
+Silnik generuje 5-10 słów kluczowych opisujących utwór.
+Mapowanie ID3: Ramka TXXX z opisem Hashtagi - Utwór.
+Cel: Te tagi są indeksowane przez wewnętrzne wyszukiwarki systemów zarządzania aktywami (MAM), co ułatwia odnalezienie utworu w bazie wytwórni po latach.
+3.2 Moduł Zarządzania Danymi Prawnymi – "Cyfrowy Prawnik"
+Muzyka to własność intelektualna. MME dba o precyzyjne odwzorowanie struktury prawnej w metadanych.
+Separacja Praw Autorskich (C vs P):
+Wiele programów wrzuca wszystko do jednego worka "Copyright". To błąd prawny.
+Prawa do Nagrania (Master Rights - P): MME zapisuje je w standardowej ramce TCOP.
+Prawa do Kompozycji (Publishing Rights - C): MME tworzy dedykowaną ramkę TXXX z opisem Copyright - Kompozycja.
+Uzasadnienie: Często właścicielem nagrania jest Wytwórnia, a kompozycji Wydawca (Publisher). Rozdzielenie tych danych w pliku jest kluczowe dla poprawnego raportowania tantiem.
+Walidacja ISRC (The License Plate):
+Kod ISRC (International Standard Recording Code) to unikalny identyfikator nagrania.
+Mapowanie ID3: Ramka TSRC.
+Funkcja: MME sprawdza poprawność składni ISRC (2 litery kraju, 3 litery rejestranta, 2 cyfry roku, 5 cyfr numeru). Zapobiega to literówkom, które są główną przyczyną "orphaned royalties" (tantiem, które nie mogą znaleźć właściciela).
+Złożone Role (Ramka TIPL):
+Standardowe ramki (Wykonawca, Kompozytor) nie wystarczają. Gdzie wpisać Inżyniera Masteringu lub Mixera?
+Mapowanie ID3: MME wykorzystuje ramkę TIPL (Involved People List), która pozwala na mapowanie Rola: Osoba.
+Przykład: Mixer: John Smith, Mastering: Jane Doe. To standard wymagany przez organizacje zbiorowego zarządzania (PROs).
+3.3 Moduł Identyfikacji i Weryfikacji – "Cyfrowy Odcisk Palca"
+MME nie tylko taguje, ale też rozpoznaje utwory, które już istnieją w ekosystemie.
+Audio Fingerprinting (AcoustID):
+System generuje cyfrowy odcisk palca audio (niezależny od metadanych) i porównuje go z bazą MusicBrainz/AcoustID.
+Mapowanie ID3:
+Unikalny identyfikator MusicBrainz trafia do ramki UFID (Unique File Identifier).
+ID odcisku AcoustID trafia do TXXX: Acoustid Id.
+Wartość: Pozwala to na "naprawienie" plików, które nie mają żadnych nazw (np. track01.mp3), poprzez pobranie metadanych z globalnej bazy na podstawie samej zawartości audio.
+IV. Stan Funkcjonalności i Etapy Zakończone
+Projekt MME znajduje się obecnie w fazie Zaawansowanej Bety / Proof of Concept (PoC) z potwierdzoną skutecznością kluczowych modułów.
+4.1 Zakończone Funkcjonalności (MVP Core)
+Mamy działający rdzeń technologiczny, który został zweryfikowany w testach jednostkowych i integracyjnych:
+Pipeline Przetwarzania: FastAPI poprawnie przyjmuje pliki, a Celery dystrybuuje zadania do workerów.
+Silnik Tagowania: Moduł oparty na mutagen poprawnie odczytuje, modyfikuje i zapisuje (z nadpisywaniem) tagi ID3v2.4, w tym ramki TXXX.
+Analiza Obiektywna: Algorytmy librosa osiągają >98% skuteczności w detekcji BPM i Tonacji dla muzyki elektronicznej i popowej.
+4.2 Wyzwania Techniczne (Ryzyka Krytyczne)
+Na drodze do wersji produkcyjnej (1.0) zidentyfikowaliśmy następujące wyzwania:
+Skalowalność Celery: Przy testach obciążeniowych (wsad 1000+ plików wysokiej jakości WAV), kolejka zadań ma tendencję do "zapychania się" pamięci RAM workerów. Wymaga to optymalizacji zarządzania pamięcią i wdrożenia polityki usuwania starych zadań.
+Kalibracja Modelu Nastroju: Model AI dla nastroju (TXXX: Mood) wciąż wymaga douczania (Fine-tuning). Obecnie radzi sobie dobrze z jasnymi emocjami (Happy/Sad), ale ma trudności z niuansami (np. "Nostalgic" vs "Melancholic").
+Złożoność Ramek TIPL: Implementacja zapisu ramki TIPL w mutagen jest nietrywialna i wymaga dopracowania logiki parsowania, aby była w pełni kompatybilna ze starszymi odtwarzaczami.
+V. Plan Rozwoju i Analiza Biznesowa
+5.1 Roadmap (Krytyczne Etapy Wdrożenia)
+Q1: Stabilizacja i Fundamenty (Current Focus)
+Finalizacja modułu prawnego (pełna obsługa TIPL i walidacja ISRC).
+Douczenie modeli AI na większym zbiorze danych (poprawa precyzji nastroju).
+Testy beta z wybranymi wytwórniami (Feedback loop).
+Q2: Monetyzacja i Integracje
+Wdrożenie bramek płatności (Stripe) i modelu subskrypcyjnego.
+Eksport danych w standardzie DDEX (XML) – to pozwoli wytwórniom wysyłać dane bezpośrednio do Spotify/Apple z poziomu MME.
+Q3+: Ekosystem
+Rozszerzenie wsparcia formatów: Pełna obsługa metadanych dla FLAC (Vorbis Comments) i MP4/M4A (iTunes tags).
+Udostępnienie Publicznego API dla deweloperów zewnętrznych.
+5.2 Model Biznesowy (SaaS)
+MME będzie operować w modelu Freemium/Premium SaaS:
+Free/Trial: Do 50 utworów/miesiąc. Podstawowe tagi (BPM, Key).
+Prosumer PRO: 500 utworów/miesiąc. Pełne AI (Mood, Instrumenty), ramki TXXX. Cena docelowa: $19/miesiąc.
+Enterprise (Label): Nielimitowane przetwarzanie, API access, eksport DDEX, wsparcie priorytetowe. Cena: Custom / od $299/miesiąc.
+5.3 Potencjał Rynkowy i ROI
+Wytwórnie i Agregatorzy: Dla podmiotu zarządzającego katalogiem 10,000 utworów, ręczne otagowanie zajęłoby ok. 1600 roboczogodzin (przyjmując 10 min/utwór na pełny research i wpisanie danych). MME robi to w kilka godzin pracy serwera. ROI jest natychmiastowe.
+Prosumenci (DIY Artists): Dostęp do narzędzi klasy Enterprise pozwala im konkurować z dużymi graczami w kwestii widoczności w serwisach streamingowych i sync.
+5.4 Główny Przekaz Marketingowy
+"Metadane to Twoja emerytura."
+W cyfrowym świecie muzyka bez metadanych nie istnieje. MME to polisa ubezpieczeniowa dla Twoich tantiem i klucz do profesjonalnej dystrybucji. Nie pozwól, by Twoja praca zginęła w algorytmach przez brakujące tagi.
+Podpisano:
+Lead System Architect & Senior Business Analyst, Music Metadata Engine Project

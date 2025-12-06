@@ -1,0 +1,3 @@
+- [ ] Install project dependencies (`npm install`)
+- [ ] Start development server (`npm run dev`)
+- [ ] Verify the application loads in a browser (`http://localhost:5173`)
