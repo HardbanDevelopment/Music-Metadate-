@@ -1,4 +1,4 @@
-from fastapi import APIRouter, UploadFile, File, HTTPException, BackgroundTasks
+from fastapi import APIRouter, UploadFile, File, BackgroundTasks
 from fastapi.responses import JSONResponse, FileResponse
 from app.services.mir import MIRService
 import shutil

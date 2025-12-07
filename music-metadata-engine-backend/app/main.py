@@ -1,5 +1,4 @@
 from fastapi import FastAPI
-from app.config import settings
 from app.routes import (
     proxy_router, spotify_router, lastfm_router, discogs_router, 
     audd_router, auth_router, history_router, quota_router, 
