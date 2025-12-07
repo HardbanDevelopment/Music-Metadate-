@@ -4,7 +4,7 @@ import tempfile
 import os
 import json # Import json for parsing TIPL
 from mutagen import File as MutagenFile
-from mutagen.id3 import ID3, TIT2, TPE1, TALB, TXXX, ID3NoHeaderError
+from mutagen.id3 import ID3, TIT2, TXXX
 from mutagen.flac import FLAC
 from app.utils.audio_metadata import is_valid_isrc
 

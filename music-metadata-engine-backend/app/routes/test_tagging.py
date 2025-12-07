@@ -4,7 +4,7 @@ from app.main import app
 import os
 import tempfile
 from mutagen.id3 import ID3, TIT2, TPE1, TALB, TXXX
-from mutagen.flac import FLAC, FLACNoHeaderError
+from mutagen.flac import FLAC
 import json
 
 client = TestClient(app)
