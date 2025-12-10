@@ -1,39 +1,32 @@
-import numpy as np
-import librosa
-import tensorflow as tf
 import os
 import io
 from typing import List, Dict, Any
 
+# Lazy imports for optional ML dependencies
+try:
+    import numpy as np
+except ImportError:
+    np = None
+
+try:
+    import librosa
+except ImportError:
+    librosa = None
+
+try:
+    import tensorflow as tf
+except ImportError:
+    tf = None
+
 # --- Configuration ---
-# Model path will be loaded from environment variables or config in the future
+# ... (constants unchanged) ...
 MODEL_PATH = os.getenv("MOOD_MODEL_PATH", "models/mood_model_v2_finetuned.h5")
-# These parameters MUST be identical to those used during training
 AUDIO_PARAMS = {"sample_rate": 22050, "duration_secs": 30, "n_mels": 128}
-# Class labels MUST match the order from training
 CLASS_LABELS = [
-    "Angry",
-    "Anxious",
-    "Calm",
-    "Celebratory",
-    "Dark",
-    "Dreamy",
-    "Energetic",
-    "Euphoric",
-    "Heartbreaking",
-    "Intense",
-    "Melancholic",
-    "Mysterious",
-    "Nostalgic",
-    "Passionate",
-    "Peaceful",
-    "Reflective",
-    "Romantic",
-    "Sad",
-    "Sensual",
-    "Somber",
-    "Triumphant",
-    "Upbeat",
+    "Angry", "Anxious", "Calm", "Celebratory", "Dark", "Dreamy", "Energetic",
+    "Euphoric", "Heartbreaking", "Intense", "Melancholic", "Mysterious",
+    "Nostalgic", "Passionate", "Peaceful", "Reflective", "Romantic", "Sad",
+    "Sensual", "Somber", "Triumphant", "Upbeat",
 ]
 
 
@@ -43,10 +36,14 @@ class AudioModelHandler:
     Loads model, processes audio files and returns predictions.
     """
 
-    model: tf.keras.Model = None
+    model: Any = None
 
     def load_model(self):
         """Loads Keras model into memory."""
+        if tf is None:
+            print("Warning: TensorFlow not installed. Mood analysis disabled.")
+            return
+
         if not os.path.exists(MODEL_PATH):
             print(
                 f"Warning: Model file not found at '{MODEL_PATH}'. Mood analysis functionality will be disabled."
@@ -62,8 +59,12 @@ class AudioModelHandler:
             print(f"Error loading model from '{MODEL_PATH}': {e}")
             self.model = None
 
-    def _preprocess_audio(self, audio_bytes: bytes) -> np.ndarray:
+    def _preprocess_audio(self, audio_bytes: bytes) -> Any:
         """Processes raw audio bytes into Mel spectrogram, ready for prediction."""
+        if librosa is None or np is None:
+            print("Warning: librosa or numpy not installed. Audio preprocessing disabled.")
+            return None
+            
         try:
             signal, sr = librosa.load(
                 io.BytesIO(audio_bytes),

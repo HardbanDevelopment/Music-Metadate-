@@ -1,9 +1,23 @@
 import os
-import numpy as np
+try:
+    import numpy as np
+except ImportError:
+    np = None
 import logging
 
 try:
     import librosa
+    import numpy as np
+except ImportError:
+    # Local analysis disabled
+    librosa = None
+    # numpy might be missing too if librosa is missing, handled by earlier lazy loading logic usually
+    # but here we imported it at top level. Wait, top level import is at line 2.
+    # If numpy is missing, line 2 crashes.
+    # But I removed numpy from requirements. So line 2 WILL crash.
+    pass
+
+try:
     from mutagen.easyid3 import EasyID3
     from mutagen.id3 import (
         ID3,
@@ -23,9 +37,11 @@ try:
     from mutagen.mp3 import MP3
     from mutagen.flac import FLAC
 except ImportError:
-    # This keeps the app from crashing if imports are missing during setup
-    librosa = None
+    # Should not happen as mutagen is in requirements
     ID3 = None
+    MP3 = None
+    FLAC = None
+    WAVE = None
 
 logger = logging.getLogger(__name__)
 
