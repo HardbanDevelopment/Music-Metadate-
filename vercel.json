@@ -1,0 +1,81 @@
+{
+    "framework": "vite",
+    "rewrites": [
+        {
+            "source": "/health",
+            "destination": "/music-metadata-engine-backend/app/main.py"
+        },
+        {
+            "source": "/mir/:match*",
+            "destination": "/music-metadata-engine-backend/app/main.py"
+        },
+        {
+            "source": "/spotify/:match*",
+            "destination": "/music-metadata-engine-backend/app/main.py"
+        },
+        {
+            "source": "/lastfm/:match*",
+            "destination": "/music-metadata-engine-backend/app/main.py"
+        },
+        {
+            "source": "/discogs/:match*",
+            "destination": "/music-metadata-engine-backend/app/main.py"
+        },
+        {
+            "source": "/audd/:match*",
+            "destination": "/music-metadata-engine-backend/app/main.py"
+        },
+        {
+            "source": "/auth/:match*",
+            "destination": "/music-metadata-engine-backend/app/main.py"
+        },
+        {
+            "source": "/history/:match*",
+            "destination": "/music-metadata-engine-backend/app/main.py"
+        },
+        {
+            "source": "/quota/:match*",
+            "destination": "/music-metadata-engine-backend/app/main.py"
+        },
+        {
+            "source": "/batch/:match*",
+            "destination": "/music-metadata-engine-backend/app/main.py"
+        },
+        {
+            "source": "/tagging",
+            "destination": "/music-metadata-engine-backend/app/main.py"
+        },
+        {
+            "source": "/tagging/:match*",
+            "destination": "/music-metadata-engine-backend/app/main.py"
+        },
+        {
+            "source": "/ddex/:match*",
+            "destination": "/music-metadata-engine-backend/app/main.py"
+        },
+        {
+            "source": "/analysis/:match*",
+            "destination": "/music-metadata-engine-backend/app/main.py"
+        },
+        {
+            "source": "/generate/:match*",
+            "destination": "/music-metadata-engine-backend/app/main.py"
+        },
+        {
+            "source": "/proxy/:match*",
+            "destination": "/music-metadata-engine-backend/app/main.py"
+        },
+        {
+            "source": "/docs",
+            "destination": "/music-metadata-engine-backend/app/main.py"
+        },
+        {
+            "source": "/openapi.json",
+            "destination": "/music-metadata-engine-backend/app/main.py"
+        },
+        {
+            "source": "/([^.]*)",
+            "destination": "/index.html"
+        }
+    ]
+}
