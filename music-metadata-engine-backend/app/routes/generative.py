@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
 from pydantic import BaseModel, Field
-from typing import Dict, Any, List
+from typing import Dict, Any
 
 from app.config import settings
 from app.dependencies import get_user_and_check_quota
-from gotrue.types import User
+from app.types import User
 import google.generativeai as genai
 import json
 
@@ -15,25 +15,45 @@ genai.configure(api_key=settings.GEMINI_API_KEY)
 
 # --- Pydantic Models for Request Bodies ---
 
+
 class RefineFieldRequest(BaseModel):
-    current_metadata: Dict[str, Any] = Field(..., description="The full current metadata object for context.")
-    field_to_refine: str = Field(..., description="The specific key/field in the metadata to be refined.")
-    refinement_instruction: str = Field(..., description="The user's instruction on how to refine the field.")
+    current_metadata: Dict[str, Any] = Field(
+        ..., description="The full current metadata object for context."
+    )
+    field_to_refine: str = Field(
+        ..., description="The specific key/field in the metadata to be refined."
+    )
+    refinement_instruction: str = Field(
+        ..., description="The user's instruction on how to refine the field."
+    )
+
 
 class MarketingContentRequest(BaseModel):
-    metadata: Dict[str, Any] = Field(..., description="The metadata object to generate content from.")
-    content_type: str = Field(..., description="Type of content, e.g., 'social', 'press', 'bio'.")
+    metadata: Dict[str, Any] = Field(
+        ..., description="The metadata object to generate content from."
+    )
+    content_type: str = Field(
+        ..., description="Type of content, e.g., 'social', 'press', 'bio'."
+    )
     tone: str = Field(..., description="Desired tone for the content.")
 
+
 class LyricalIdeasRequest(BaseModel):
-    metadata: Dict[str, Any] = Field(..., description="The metadata object to generate ideas from.")
-    
+    metadata: Dict[str, Any] = Field(
+        ..., description="The metadata object to generate ideas from."
+    )
+
+
 class CoverArtRequest(BaseModel):
-    metadata: Dict[str, Any] = Field(..., description="The metadata object to generate cover art ideas from.")
+    metadata: Dict[str, Any] = Field(
+        ..., description="The metadata object to generate cover art ideas from."
+    )
 
 
 # --- Helper for Gemini JSON response ---
-async def call_gemini_json(prompt: str, model_name: str = "gemini-1.5-flash") -> Dict[str, Any]:
+async def call_gemini_json(
+    prompt: str, model_name: str = "gemini-2.0-flash"
+) -> Dict[str, Any]:
     try:
         model = genai.GenerativeModel(
             model_name=model_name,
@@ -44,10 +64,13 @@ async def call_gemini_json(prompt: str, model_name: str = "gemini-1.5-flash") ->
     except json.JSONDecodeError:
         raise HTTPException(status_code=500, detail="AI model returned invalid JSON.")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"An error occurred with the AI model: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"An error occurred with the AI model: {str(e)}"
+        )
 
 
 # --- New Endpoints ---
+
 
 @router.post("/refine_field", dependencies=[Depends(get_user_and_check_quota)])
 async def refine_metadata_field(request: RefineFieldRequest):
@@ -59,6 +82,7 @@ async def refine_metadata_field(request: RefineFieldRequest):
     Output JSON with ONLY the key "{request.field_to_refine}".
     """
     return await call_gemini_json(prompt)
+
 
 @router.post("/marketing_content", dependencies=[Depends(get_user_and_check_quota)])
 async def generate_marketing_content(request: MarketingContentRequest):
@@ -81,10 +105,10 @@ async def generate_cover_art_idea(request: CoverArtRequest):
     """
     return await call_gemini_json(prompt)
 
+
 @router.post("/analyze_lyrics", dependencies=[Depends(get_user_and_check_quota)])
 async def analyze_lyrics(
-    metadata: str = Form(...), # JSON string of metadata
-    file: UploadFile = File(...)
+    metadata: str = Form(...), file: UploadFile = File(...)  # JSON string of metadata
 ):
     metadata_dict = json.loads(metadata)
     lyrics = metadata_dict.get("lyrics", "")
@@ -92,7 +116,10 @@ async def analyze_lyrics(
         # If no lyrics in metadata, we would need to transcribe the audio file.
         # This is a complex task. For now, we rely on existing lyrics.
         # This is a potential enhancement for later.
-        raise HTTPException(status_code=400, detail="Lyrics not found in metadata. Audio transcription not yet implemented.")
+        raise HTTPException(
+            status_code=400,
+            detail="Lyrics not found in metadata. Audio transcription not yet implemented.",
+        )
 
     prompt = f"""
     Analyze the following lyrics: "{lyrics}"
@@ -100,7 +127,8 @@ async def analyze_lyrics(
     Return a JSON object with keys "theme", "mood", "summary".
     """
     return await call_gemini_json(prompt)
-    
+
+
 @router.post("/lyrical_ideas", dependencies=[Depends(get_user_and_check_quota)])
 async def generate_lyrical_ideas(request: LyricalIdeasRequest):
     prompt = f"""
@@ -111,10 +139,10 @@ async def generate_lyrical_ideas(request: LyricalIdeasRequest):
     """
     return await call_gemini_json(prompt)
 
+
 @router.post("/analyze_structure")
 async def analyze_structure(
-    file: UploadFile = File(...),
-    current_user: User = Depends(get_user_and_check_quota)
+    file: UploadFile = File(...), current_user: User = Depends(get_user_and_check_quota)
 ):
     # This still reads the whole file into memory. It will be fixed in Step 2.
     audio_file = {"mime_type": file.content_type, "data": await file.read()}

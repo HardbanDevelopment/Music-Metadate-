@@ -4,6 +4,7 @@ import xml.etree.ElementTree as ET
 
 router = APIRouter(prefix="/ddex", tags=["ddex"])
 
+
 @router.post("/export")
 def export_ddex(metadata: Dict = Body(...)):
     # Dummy DDEX XML generation

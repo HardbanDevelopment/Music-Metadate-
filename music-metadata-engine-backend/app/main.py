@@ -1,10 +1,20 @@
 from fastapi import FastAPI
-from app.config import settings
 from app.routes import (
-    proxy_router, spotify_router, lastfm_router, discogs_router, 
-    audd_router, auth_router, history_router, quota_router, 
-    batch_router, tagging_router, ddex_router, analysis_router,
-    generative_router, health_router, mir_router
+    proxy_router,
+    spotify_router,
+    lastfm_router,
+    discogs_router,
+    audd_router,
+    auth_router,
+    history_router,
+    quota_router,
+    batch_router,
+    tagging_router,
+    ddex_router,
+    analysis_router,
+    generative_router,
+    health_router,
+    mir_router,
 )
 
 app = FastAPI()
@@ -25,7 +35,7 @@ app.include_router(ddex_router)
 app.include_router(analysis_router)
 app.include_router(generative_router)
 
+
 @app.get("/")
 def read_root():
     return {"message": "Music Metadata Engine Backend is running."}
-

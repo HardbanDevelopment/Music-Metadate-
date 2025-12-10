@@ -279,7 +279,7 @@ const UnifiedMetadataCard: React.FC<UnifiedMetadataCardProps> = ({ metadata, isE
         try {
             const result = await fetchLyrics(metadata.artist, metadata.title);
             if (result.error) { setLyricsError(result.error); } else { setFetchedLyrics(result.lyrics); }
-        } catch (e) { setLyricsError("Błąd pobierania"); } finally { setIsLyricsLoading(false); }
+        } catch (e) { setLyricsError("Fetch error"); } finally { setIsLyricsLoading(false); }
     };
 
     const handleAnalyzeLyricsAI = async () => {
@@ -363,14 +363,14 @@ const UnifiedMetadataCard: React.FC<UnifiedMetadataCardProps> = ({ metadata, isE
             <div className="flex flex-col md:flex-row gap-6 mb-8 pb-6 border-b border-slate-100 dark:border-slate-800 relative">
                 {dspData && (
                     <div className="absolute top-0 right-0 animate-fade-in">
-                        <Tooltip text="Dodaj ten utwór do bazy wiedzy AI, aby ulepszyć przyszłe analizy">
+                        <Tooltip text="Add this track to AI knowledge base to improve future analyses">
                             <button
                                 onClick={handleTrainModel}
                                 disabled={isTraining}
                                 className={`flex items-center gap-1 text-[10px] uppercase font-bold px-2 py-1 rounded-full transition-all ${isTraining ? 'bg-green-100 text-green-600' : 'bg-slate-100 text-slate-500 hover:bg-accent-violet hover:text-white'}`}
                             >
                                 {isTraining ? <CheckCircle2 className="w-3 h-3" /> : <BrainCircuit className="w-3 h-3" />}
-                                {isTraining ? 'Nauczono' : 'Trenuj Model'}
+                                {isTraining ? 'Trained' : 'Train Model'}
                             </button>
                         </Tooltip>
                     </div>
@@ -393,7 +393,7 @@ const UnifiedMetadataCard: React.FC<UnifiedMetadataCardProps> = ({ metadata, isE
                 <div className="flex-grow flex flex-col justify-center text-center md:text-left">
                     <div className="mb-2">
                         <div className="flex items-center justify-center md:justify-start gap-2 mb-1">
-                            <label className="text-[10px] font-bold text-accent-violet uppercase tracking-wider">Tytuł Utworu</label>
+                            <label className="text-[10px] font-bold text-accent-violet uppercase tracking-wider">Track Title</label>
                             {isEditing && <button onClick={() => onRefine('title')} disabled={!!refiningField}><Sparkles className="w-3 h-3 text-accent-violet" /></button>}
                         </div>
                         <EditableInput
@@ -401,7 +401,7 @@ const UnifiedMetadataCard: React.FC<UnifiedMetadataCardProps> = ({ metadata, isE
                             value={metadata.title}
                             onChange={v => onFieldUpdate('title', v)}
                             className="text-3xl font-black tracking-tight text-slate-900 dark:text-white leading-none"
-                            placeholder="Tytuł"
+                            placeholder="Title"
                         />
                     </div>
                     <div>
@@ -442,7 +442,7 @@ const UnifiedMetadataCard: React.FC<UnifiedMetadataCardProps> = ({ metadata, isE
 
                 {/* COL 1: TECHNICAL & STRUCTURE */}
                 <div className="lg:pr-6 space-y-6">
-                    <SectionHeader icon={<Activity className="w-5 h-5" />} title="Inżynieria & Struktura" color="text-blue-500" />
+                    <SectionHeader icon={<Activity className="w-5 h-5" />} title="Engineering & Structure" color="text-blue-500" />
 
                     <div className="grid grid-cols-2 gap-3">
                         <div className="text-center p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-800 group hover:border-blue-500/30 transition-colors">
@@ -450,7 +450,7 @@ const UnifiedMetadataCard: React.FC<UnifiedMetadataCardProps> = ({ metadata, isE
                             <div className="text-3xl font-black text-slate-800 dark:text-slate-100 group-hover:scale-110 transition-transform">{metadata.bpm || dspData?.bpm || 0}</div>
                         </div>
                         <div className="text-center p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-800 group hover:border-blue-500/30 transition-colors">
-                            <span className="text-[9px] font-bold text-slate-400 uppercase block mb-1">Tonacja</span>
+                            <span className="text-[9px] font-bold text-slate-400 uppercase block mb-1">Key</span>
                             <div className="text-2xl font-bold text-slate-800 dark:text-slate-100 group-hover:scale-110 transition-transform">
                                 {metadata.key || dspData?.key || '-'} <span className="text-sm font-medium text-slate-500">{metadata.mode}</span>
                             </div>
@@ -462,29 +462,18 @@ const UnifiedMetadataCard: React.FC<UnifiedMetadataCardProps> = ({ metadata, isE
                         <div className="bg-slate-50 dark:bg-slate-900/40 p-3 rounded-xl border border-blue-100 dark:border-blue-900/30">
                             <div className="flex items-center gap-2 mb-2">
                                 <BrainCircuit className="w-3 h-3 text-blue-500" />
-                                <span className="text-[9px] font-bold uppercase text-blue-500 tracking-wider">Analiza Techniczna (Python MIR)</span>
+                                <span className="text-[9px] font-bold uppercase text-blue-500 tracking-wider">Technical Analysis (Python MIR)</span>
                             </div>
                             <div className="grid grid-cols-3 gap-2 text-center">
-                                <div className="p-2 bg-white dark:bg-slate-800 rounded border border-slate-100 dark:border-slate-700">
-                                    <span className="text-[8px] text-slate-400 uppercase block">Jasność (Centroid)</span>
-                                    <span className="font-mono text-xs font-bold text-slate-700 dark:text-slate-200">{Math.round(metadata.spectral_centroid || 0)} Hz</span>
-                                </div>
-                                <div className="p-2 bg-white dark:bg-slate-800 rounded border border-slate-100 dark:border-slate-700">
-                                    <span className="text-[8px] text-slate-400 uppercase block">Szorstkość (Rolloff)</span>
-                                    <span className="font-mono text-xs font-bold text-slate-700 dark:text-slate-200">{Math.round(metadata.spectral_rolloff || 0)} Hz</span>
-                                </div>
-                                <div className="p-2 bg-white dark:bg-slate-800 rounded border border-slate-100 dark:border-slate-700">
-                                    <span className="text-[8px] text-slate-400 uppercase block">Taneczność</span>
-                                    <span className="font-mono text-xs font-bold text-slate-700 dark:text-slate-200">{metadata.danceability || '-'}</span>
-                                </div>
                             </div>
                         </div>
+
                     )}
 
                     {/* DSP Visualization Block */}
                     <div className="bg-slate-50 dark:bg-slate-900/30 p-4 rounded-xl border border-slate-100 dark:border-slate-800">
                         <div className="flex justify-between items-center mb-4">
-                            <span className="text-[10px] font-bold uppercase text-slate-500">Parametry Sygnału</span>
+                            <span className="text-[10px] font-bold uppercase text-slate-500">Signal Parameters</span>
                             {isDspLoading && <div className="w-3 h-3 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>}
                         </div>
 
@@ -554,7 +543,7 @@ const UnifiedMetadataCard: React.FC<UnifiedMetadataCardProps> = ({ metadata, isE
                             />
                         </FieldGroup>
 
-                        <FieldGroup label="Nastrój / Emocje" onRefine={() => onRefine('moods')} isRefining={refiningField === 'moods'}>
+                        <FieldGroup label="Mood / Emotions" onRefine={() => onRefine('moods')} isRefining={refiningField === 'moods'}>
                             <TagInput
                                 isEditing={isEditing}
                                 tags={metadata.moods}
@@ -563,7 +552,7 @@ const UnifiedMetadataCard: React.FC<UnifiedMetadataCardProps> = ({ metadata, isE
                             />
                         </FieldGroup>
 
-                        <FieldGroup label="Gatunki Poboczne" onRefine={() => onRefine('additionalGenres')} isRefining={refiningField === 'additionalGenres'}>
+                        <FieldGroup label="Subgenres" onRefine={() => onRefine('additionalGenres')} isRefining={refiningField === 'additionalGenres'}>
                             <TagInput
                                 isEditing={isEditing}
                                 tags={metadata.additionalGenres}
@@ -572,7 +561,7 @@ const UnifiedMetadataCard: React.FC<UnifiedMetadataCardProps> = ({ metadata, isE
                             />
                         </FieldGroup>
 
-                        <FieldGroup label="Styl Wokalny" onRefine={() => onRefine('vocalStyle')} isRefining={refiningField === 'vocalStyle'}>
+                        <FieldGroup label="Vocal Style" onRefine={() => onRefine('vocalStyle')} isRefining={refiningField === 'vocalStyle'}>
                             {(metadata.vocalStyle?.gender && metadata.vocalStyle.gender !== 'None') ? (
                                 <div className="flex flex-wrap gap-2 text-xs">
                                     <span className="px-2 py-1 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md text-slate-600 dark:text-slate-300">
@@ -586,7 +575,7 @@ const UnifiedMetadataCard: React.FC<UnifiedMetadataCardProps> = ({ metadata, isE
                                     </span>
                                 </div>
                             ) : (
-                                <div className="text-sm text-slate-400 italic">Utwór instrumentalny</div>
+                                <div className="text-sm text-slate-400 italic">Instrumental track</div>
                             )}
                         </FieldGroup>
                     </div>
@@ -594,28 +583,28 @@ const UnifiedMetadataCard: React.FC<UnifiedMetadataCardProps> = ({ metadata, isE
 
                 {/* COL 3: CONTEXT & DESCRIPTION */}
                 <div className="lg:pl-6 pt-6 lg:pt-0 space-y-6">
-                    <SectionHeader icon={<MessageSquare className="w-5 h-5" />} title="Kontekst & Opis" color="text-emerald-500" />
+                    <SectionHeader icon={<MessageSquare className="w-5 h-5" />} title="Context & Description" color="text-emerald-500" />
 
                     <div className="space-y-5">
                         {/* Legal & Credits Block */}
                         <div className="p-3 bg-slate-50 dark:bg-slate-900/40 rounded-lg border border-slate-100 dark:border-slate-800 space-y-3">
                             <div className="grid grid-cols-2 gap-4">
-                                <FieldGroup label="Wytwórnia (Label)">
-                                    <EditableInput isEditing={isEditing} value={metadata.label} onChange={v => onFieldUpdate('label', v)} placeholder="Np. Sony Music" className="text-sm font-medium" />
+                                <FieldGroup label="Label">
+                                    <EditableInput isEditing={isEditing} value={metadata.label} onChange={v => onFieldUpdate('label', v)} placeholder="E.g. Sony Music" className="text-sm font-medium" />
                                 </FieldGroup>
-                                <FieldGroup label="Wydawca (Publisher)">
-                                    <EditableInput isEditing={isEditing} value={metadata.publisher} onChange={v => onFieldUpdate('publisher', v)} placeholder="Np. Sony ATV" className="text-sm font-medium" />
+                                <FieldGroup label="Publisher">
+                                    <EditableInput isEditing={isEditing} value={metadata.publisher} onChange={v => onFieldUpdate('publisher', v)} placeholder="E.g. Sony ATV" className="text-sm font-medium" />
                                 </FieldGroup>
                             </div>
                             <div className="grid grid-cols-2 gap-4">
-                                <FieldGroup label="Kompozytor">
-                                    <EditableInput isEditing={isEditing} value={metadata.composer} onChange={v => onFieldUpdate('composer', v)} placeholder="Imię Nazwisko" className="text-sm" />
+                                <FieldGroup label="Composer">
+                                    <EditableInput isEditing={isEditing} value={metadata.composer} onChange={v => onFieldUpdate('composer', v)} placeholder="First Last" className="text-sm" />
                                 </FieldGroup>
-                                <FieldGroup label="Tekściarz">
-                                    <EditableInput isEditing={isEditing} value={metadata.lyricist} onChange={v => onFieldUpdate('lyricist', v)} placeholder="Imię Nazwisko" className="text-sm" />
+                                <FieldGroup label="Lyricist">
+                                    <EditableInput isEditing={isEditing} value={metadata.lyricist} onChange={v => onFieldUpdate('lyricist', v)} placeholder="First Last" className="text-sm" />
                                 </FieldGroup>
                             </div>
-                            <FieldGroup label="Prawa Autorskie (Copyright)">
+                            <FieldGroup label="Copyright">
                                 <div className="flex items-center gap-2">
                                     <CopyrightIcon className="w-3 h-3 text-slate-400" />
                                     <EditableInput isEditing={isEditing} value={metadata.copyright} onChange={v => onFieldUpdate('copyright', v)} placeholder="(C) 2024 Artist Name" className="text-sm font-mono text-slate-600 dark:text-slate-300" />
@@ -623,7 +612,7 @@ const UnifiedMetadataCard: React.FC<UnifiedMetadataCardProps> = ({ metadata, isE
                             </FieldGroup>
                         </div>
 
-                        <FieldGroup label="Pełny Tekst Utworu (Lyrics)" extraAction={<span className="text-[9px] text-slate-400">USLT Frame</span>}>
+                        <FieldGroup label="Full Track Lyrics" extraAction={<span className="text-[9px] text-slate-400">USLT Frame</span>}>
                             <EditableInput
                                 isEditing={isEditing}
                                 value={metadata.lyrics}
@@ -657,16 +646,16 @@ const UnifiedMetadataCard: React.FC<UnifiedMetadataCardProps> = ({ metadata, isE
                                     )}
                                     {uploadedFile && (
                                         <button onClick={handleAnalyzeLyricsAI} disabled={isLyricsLoading} className="text-xs text-accent-violet hover:underline flex items-center gap-1">
-                                            <Sparkles className="w-3 h-3" /> Transkrybuj
+                                            <Sparkles className="w-3 h-3" /> Transcribe
                                         </button>
                                     )}
                                     <button onClick={handleGenerateLyricsIdeas} disabled={isLyricsLoading} className="text-xs text-pink-500 hover:underline flex items-center gap-1">
-                                        <BrainCircuit className="w-3 h-3" /> Pomysły
+                                        <BrainCircuit className="w-3 h-3" /> Ideas
                                     </button>
                                 </div>
                             </div>
 
-                            {isLyricsLoading && <div className="text-xs text-slate-500">Przetwarzanie tekstu...</div>}
+                            {isLyricsLoading && <div className="text-xs text-slate-500">Processing lyrics...</div>}
                             {lyricsError && <div className="text-xs text-red-500">{lyricsError}</div>}
 
                             {(fetchedLyrics || lyricsData) && (
@@ -675,9 +664,9 @@ const UnifiedMetadataCard: React.FC<UnifiedMetadataCardProps> = ({ metadata, isE
                                         {fetchedLyrics || (lyricsData as LyricsAnalysis)?.lyrics || (lyricsData as LyricalIdeas)?.verse + "\n...\n" + (lyricsData as LyricalIdeas)?.chorus}
                                     </div>
                                     <button
-                                        onClick={() => { navigator.clipboard.writeText(fetchedLyrics || (lyricsData as LyricsAnalysis)?.lyrics || ''); showToast("Skopiowano tekst!", 'success'); }}
+                                        onClick={() => { navigator.clipboard.writeText(fetchedLyrics || (lyricsData as LyricsAnalysis)?.lyrics || ''); showToast("Copied lyrics!", 'success'); }}
                                         className="absolute top-2 right-2 p-1 bg-white dark:bg-slate-800 rounded shadow opacity-0 group-hover:opacity-100 transition-opacity"
-                                        title="Kopiuj tekst"
+                                        title="Copy lyrics"
                                     >
                                         <Download className="w-3 h-3 text-slate-500" />
                                     </button>
@@ -693,19 +682,19 @@ const UnifiedMetadataCard: React.FC<UnifiedMetadataCardProps> = ({ metadata, isE
                                 </label>
                                 {!lastFmData && !isMarketLoading && (
                                     <button onClick={handleFetchMarketData} className="text-xs text-accent-violet hover:underline flex items-center gap-1">
-                                        <Database className="w-3 h-3" /> Analizuj Trendy
+                                        <Database className="w-3 h-3" /> Analyze Trends
                                     </button>
                                 )}
                             </div>
 
-                            {isMarketLoading && <div className="text-xs text-slate-500 flex gap-2 items-center"><div className="w-3 h-3 border-2 border-slate-400 border-t-transparent rounded-full animate-spin" /> Pobieranie danych Last.fm & Discogs...</div>}
+                            {isMarketLoading && <div className="text-xs text-slate-500 flex gap-2 items-center"><div className="w-3 h-3 border-2 border-slate-400 border-t-transparent rounded-full animate-spin" /> Fetching Last.fm & Discogs data...</div>}
 
                             {(lastFmData || discogsData) && (
                                 <div className="bg-slate-50 dark:bg-slate-900/30 p-3 rounded-lg border border-slate-100 dark:border-slate-800 space-y-3 text-xs animate-fade-in">
                                     {/* Last.fm Tags */}
                                     {lastFmData?.track?.toptags?.tag?.length ? (
                                         <div>
-                                            <span className="font-bold text-red-500 block mb-1">Last.fm Tagi Społeczności:</span>
+                                            <span className="font-bold text-red-500 block mb-1">Last.fm Community Tags:</span>
                                             <div className="flex flex-wrap gap-1">
                                                 {lastFmData.track.toptags.tag.slice(0, 5).map(t => (
                                                     <span key={t.name} className="px-1.5 py-0.5 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-300 rounded text-[10px] hover:bg-red-200 dark:hover:bg-red-900/50 cursor-default transition-colors">
@@ -743,7 +732,7 @@ const UnifiedMetadataCard: React.FC<UnifiedMetadataCardProps> = ({ metadata, isE
                         {/* ... (Other fields) ... */}
 
                         <div className="grid grid-cols-2 gap-4">
-                            <FieldGroup label="Język">
+                            <FieldGroup label="Language">
                                 <div className="flex items-center gap-2">
                                     <Globe className="w-3 h-3 text-slate-400" />
                                     <EditableInput isEditing={isEditing} value={metadata.language} onChange={v => onFieldUpdate('language', v)} className="font-medium text-sm" />
@@ -757,7 +746,7 @@ const UnifiedMetadataCard: React.FC<UnifiedMetadataCardProps> = ({ metadata, isE
                 </div>
 
             </div>
-        </Card>
+        </Card >
     );
 };
 

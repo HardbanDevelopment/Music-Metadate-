@@ -1,5 +1,6 @@
 import re
 
+
 def is_valid_isrc(isrc_code: str) -> bool:
     """
     Validates the format of an ISRC code.
@@ -19,7 +20,7 @@ def is_valid_isrc(isrc_code: str) -> bool:
     # ^[A-Z]{2}[A-Z0-9]{3}[0-9]{2}[0-9]{5}$ (without hyphens)
     # Or for input that might contain hyphens:
     isrc_pattern = re.compile(r"^[A-Z]{2}[A-Z0-9]{3}[0-9]{2}[0-9]{5}$", re.IGNORECASE)
-    
+
     # Remove hyphens for strict validation if present in input
     cleaned_isrc = isrc_code.replace("-", "")
 

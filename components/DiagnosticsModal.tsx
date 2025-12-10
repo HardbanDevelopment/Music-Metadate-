@@ -16,8 +16,7 @@ const DiagnosticsModal: React.FC<DiagnosticsModalProps> = ({ onClose }) => {
             frontend: {
                 userAgent: navigator.userAgent,
                 time: new Date().toISOString(),
-                puterLoaded: false,
-                puterAI: false,
+                time: new Date().toISOString(),
             },
             backend: {
                 connected: false,
@@ -27,14 +26,7 @@ const DiagnosticsModal: React.FC<DiagnosticsModalProps> = ({ onClose }) => {
         };
 
         // Frontend Checks
-        // @ts-ignore
-        if (window.puter) {
-            report.frontend.puterLoaded = true;
-            // @ts-ignore
-            if (window.puter.ai && window.puter.ai.chat) {
-                report.frontend.puterAI = true;
-            }
-        }
+
 
         // Backend Checks
         try {
@@ -73,8 +65,8 @@ const DiagnosticsModal: React.FC<DiagnosticsModalProps> = ({ onClose }) => {
                             <Wrench className="w-6 h-6" />
                         </div>
                         <div>
-                            <h2 className="text-xl font-bold text-slate-900 dark:text-white">Diagnostyka Systemu</h2>
-                            <p className="text-sm text-slate-500 dark:text-slate-400">Autodiagnoza komponentów</p>
+                            <h2 className="text-xl font-bold text-slate-900 dark:text-white">System Diagnostics</h2>
+                            <p className="text-sm text-slate-500 dark:text-slate-400">Component autodiagnosis</p>
                         </div>
                     </div>
                     <button onClick={onClose} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors text-slate-500">
@@ -86,24 +78,17 @@ const DiagnosticsModal: React.FC<DiagnosticsModalProps> = ({ onClose }) => {
                     {isLoading ? (
                         <div className="flex flex-col items-center justify-center py-12">
                             <div className="w-12 h-12 border-4 border-accent-violet border-t-transparent rounded-full animate-spin mb-4" />
-                            <p className="text-slate-500 font-medium">Trwa sprawdzanie systemu...</p>
+                            <p className="text-slate-500 font-medium">Checking system...</p>
                         </div>
                     ) : (
                         <>
                             {/* Frontend Section */}
                             <div className="space-y-4">
                                 <h3 className="text-sm font-bold uppercase text-slate-500 tracking-wider flex items-center gap-2">
-                                    <Activity className="w-4 h-4" /> Klient (Frontend)
+                                    <Activity className="w-4 h-4" /> Client (Frontend)
                                 </h3>
                                 <div className="bg-slate-50 dark:bg-slate-900/50 rounded-xl p-4 border border-slate-100 dark:border-slate-800 space-y-3">
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-sm font-medium">Puter.js (Biblioteka)</span>
-                                        <StatusIcon ok={results.frontend.puterLoaded} />
-                                    </div>
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-sm font-medium">Puter.js AI (Chat)</span>
-                                        <StatusIcon ok={results.frontend.puterAI} />
-                                    </div>
+
                                     <div className="text-xs text-slate-400 font-mono pt-2 border-t border-slate-200 dark:border-slate-700">
                                         UA: {results.frontend.userAgent}
                                     </div>
@@ -113,7 +98,7 @@ const DiagnosticsModal: React.FC<DiagnosticsModalProps> = ({ onClose }) => {
                             {/* Backend Section */}
                             <div className="space-y-4">
                                 <h3 className="text-sm font-bold uppercase text-slate-500 tracking-wider flex items-center gap-2">
-                                    <Server className="w-4 h-4" /> Serwer (Backend)
+                                    <Server className="w-4 h-4" /> Server (Backend)
                                 </h3>
                                 <div className="bg-slate-50 dark:bg-slate-900/50 rounded-xl p-4 border border-slate-100 dark:border-slate-800 space-y-3">
                                     <div className="flex items-center justify-between">
@@ -129,7 +114,7 @@ const DiagnosticsModal: React.FC<DiagnosticsModalProps> = ({ onClose }) => {
 
                                     {results.backend.data && (
                                         <>
-                                            <div className="mt-4 mb-2 text-xs font-bold text-slate-400 uppercase">Zmienne Środowiskowe (API Keys)</div>
+                                            <div className="mt-4 mb-2 text-xs font-bold text-slate-400 uppercase">Environment Variables (API Keys)</div>
                                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                                 {Object.entries(results.backend.data.environment_variables).map(([key, val]: [string, any]) => (
                                                     <div key={key} className="flex justify-between items-center bg-white dark:bg-slate-900 p-2 rounded border border-slate-200 dark:border-slate-800">
@@ -151,10 +136,10 @@ const DiagnosticsModal: React.FC<DiagnosticsModalProps> = ({ onClose }) => {
 
                 <div className="p-6 border-t border-slate-100 dark:border-slate-800 flex justify-end gap-3 bg-slate-50 dark:bg-slate-900/50">
                     <Button onClick={runTests} variant="secondary" size="md">
-                        Odśwież
+                        Refresh
                     </Button>
                     <Button onClick={onClose} variant="primary" size="md">
-                        Zamknij
+                        Close
                     </Button>
                 </div>
             </div>

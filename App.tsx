@@ -123,7 +123,7 @@ export default function App() {
   const handleLogout = () => {
     setSession(null);
     localStorage.removeItem('supabaseSession');
-    showToast('Wylogowano pomyślnie.', 'info');
+    showToast('Logged out successfully.', 'info');
   };
 
   // --- CORE APP LOGIC ---
@@ -136,7 +136,7 @@ export default function App() {
 
     const itemsToProcess = batch.filter(item => item.status === 'pending');
     if (itemsToProcess.length === 0) {
-      showToast("Dodaj pliki do analizy.", 'info');
+      showToast("Add files to analyze.", 'info');
       return;
     }
 
@@ -176,27 +176,27 @@ export default function App() {
         setBatch(prev => prev.map(b => b.id === item.id ? { ...b, status: 'completed', metadata: results } : b));
       } catch (err) {
         failedCount++;
-        const errorMessage = err instanceof Error ? err.message : "Wystąpił nieznany błąd.";
+        const errorMessage = err instanceof Error ? err.message : "An unknown error occurred.";
         setBatch(prev => prev.map(b => b.id === item.id ? { ...b, status: 'error', error: errorMessage } : b));
       }
     }
 
     setIsProcessingBatch(false);
     if (failedCount === 0) {
-      showToast("Przetwarzanie zakończone sukcesem!", "success");
+      showToast("Processing completed successfully!", "success");
     } else {
-      showToast(`Zakończono. Błędy: ${failedCount}`, "error");
+      showToast(`Completed. Errors: ${failedCount}`, "error");
     }
   };
 
   const handleExportBatch = () => {
     const completedItems = batch.filter(item => item.status === 'completed');
     if (completedItems.length === 0) {
-      showToast("Brak ukończonych analiz do wyeksportowania.", 'info');
+      showToast("No completed analyses to export.", 'info');
       return;
     }
     exportBatchToCsv(completedItems);
-    showToast(`Wyeksportowano ${completedItems.length} utworów.`, 'success');
+    showToast(`Exported ${completedItems.length} tracks.`, 'success');
   };
 
   const handleViewResults = (itemId: string) => {

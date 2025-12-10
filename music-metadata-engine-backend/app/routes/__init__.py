@@ -15,5 +15,3 @@ from .analysis import router as analysis_router
 from .health import router as health_router
 from .mir import router as mir_router
 from .generative import router as generative_router
-
-

@@ -1,82 +1,110 @@
-# music-metadata-engine-backend/app/utils/audio_model_handler.py
 import numpy as np
 import librosa
 import tensorflow as tf
 import os
+import io
 from typing import List, Dict, Any
 
-# --- Konfiguracja ---
-# Ścieżka do modelu zostanie wczytana ze zmiennych środowiskowych lub configu w przyszłości
+# --- Configuration ---
+# Model path will be loaded from environment variables or config in the future
 MODEL_PATH = os.getenv("MOOD_MODEL_PATH", "models/mood_model_v2_finetuned.h5")
-# Te parametry MUSZĄ być identyczne jak podczas treningu
-AUDIO_PARAMS = {
-    "sample_rate": 22050,
-    "duration_secs": 30,
-    "n_mels": 128
-}
-# Etykiety klas MUSZĄ odpowiadać kolejności z treningu
+# These parameters MUST be identical to those used during training
+AUDIO_PARAMS = {"sample_rate": 22050, "duration_secs": 30, "n_mels": 128}
+# Class labels MUST match the order from training
 CLASS_LABELS = [
-    'Angry', 'Anxious', 'Calm', 'Celebratory', 'Dark', 'Dreamy', 'Energetic', 
-    'Euphoric', 'Heartbreaking', 'Intense', 'Melancholic', 'Mysterious', 
-    'Nostalgic', 'Passionate', 'Peaceful', 'Reflective', 'Romantic', 
-    'Sad', 'Sensual', 'Somber', 'Triumphant', 'Upbeat'
+    "Angry",
+    "Anxious",
+    "Calm",
+    "Celebratory",
+    "Dark",
+    "Dreamy",
+    "Energetic",
+    "Euphoric",
+    "Heartbreaking",
+    "Intense",
+    "Melancholic",
+    "Mysterious",
+    "Nostalgic",
+    "Passionate",
+    "Peaceful",
+    "Reflective",
+    "Romantic",
+    "Sad",
+    "Sensual",
+    "Somber",
+    "Triumphant",
+    "Upbeat",
 ]
+
 
 class AudioModelHandler:
     """
-    Klasa do obsługi modelu klasyfikacji nastroju audio.
-    Ładuje model, przetwarza pliki audio i zwraca predykcje.
+    Class for handling audio mood classification model.
+    Loads model, processes audio files and returns predictions.
     """
+
     model: tf.keras.Model = None
 
     def load_model(self):
-        """Ładuje model Keras do pamięci."""
+        """Loads Keras model into memory."""
         if not os.path.exists(MODEL_PATH):
-            print(f"Ostrzeżenie: Plik modelu nie został znaleziony w '{MODEL_PATH}'. Funkcjonalność analizy nastroju będzie wyłączona.")
+            print(
+                f"Warning: Model file not found at '{MODEL_PATH}'. Mood analysis functionality will be disabled."
+            )
             self.model = None
             return
 
         try:
-            print(f"Ładowanie modelu z: {MODEL_PATH}")
+            print(f"Loading model from: {MODEL_PATH}")
             self.model = tf.keras.models.load_model(MODEL_PATH)
-            print("Model analizy nastroju załadowany pomyślnie.")
+            print("Mood analysis model loaded successfully.")
         except Exception as e:
-            print(f"Błąd podczas ładowania modelu z '{MODEL_PATH}': {e}")
+            print(f"Error loading model from '{MODEL_PATH}': {e}")
             self.model = None
 
     def _preprocess_audio(self, audio_bytes: bytes) -> np.ndarray:
-        """Przetwarza surowe bajty audio na spektrogram Mel, gotowy do predykcji."""
+        """Processes raw audio bytes into Mel spectrogram, ready for prediction."""
         try:
-            signal, sr = librosa.load(io.BytesIO(audio_bytes), sr=AUDIO_PARAMS['sample_rate'], duration=AUDIO_PARAMS['duration_secs'])
-            
-            # Wyrównanie długości sygnału
-            expected_length = AUDIO_PARAMS['sample_rate'] * AUDIO_PARAMS['duration_secs']
+            signal, sr = librosa.load(
+                io.BytesIO(audio_bytes),
+                sr=AUDIO_PARAMS["sample_rate"],
+                duration=AUDIO_PARAMS["duration_secs"],
+            )
+
+            # Align signal length
+            expected_length = (
+                AUDIO_PARAMS["sample_rate"] * AUDIO_PARAMS["duration_secs"]
+            )
             if len(signal) < expected_length:
-                signal = np.pad(signal, (0, expected_length - len(signal)), 'constant')
+                signal = np.pad(signal, (0, expected_length - len(signal)), "constant")
             else:
                 signal = signal[:expected_length]
 
             # Ekstrakcja cech (spektrogram Mel)
-            mel_spectrogram = librosa.feature.melspectrogram(y=signal, sr=sr, n_mels=AUDIO_PARAMS['n_mels'])
+            mel_spectrogram = librosa.feature.melspectrogram(
+                y=signal, sr=sr, n_mels=AUDIO_PARAMS["n_mels"]
+            )
             log_mel_spectrogram = librosa.power_to_db(mel_spectrogram, ref=np.max)
 
             # Normalizacja
             min_val, max_val = np.min(log_mel_spectrogram), np.max(log_mel_spectrogram)
             if max_val - min_val > 0:
-                normalized_spectrogram = (log_mel_spectrogram - min_val) / (max_val - min_val)
+                normalized_spectrogram = (log_mel_spectrogram - min_val) / (
+                    max_val - min_val
+                )
             else:
                 normalized_spectrogram = log_mel_spectrogram
 
-            # Dodanie wymiaru batcha i kanału
+            # Add batch and channel dimensions
             return normalized_spectrogram[np.newaxis, ..., np.newaxis]
 
         except Exception as e:
-            print(f"Błąd podczas przetwarzania audio: {e}")
+            print(f"Error during audio processing: {e}")
             return None
 
     def predict_moods(self, audio_bytes: bytes, top_n: int = 5) -> List[Dict[str, Any]]:
         """
-        Dokonuje predykcji nastrojów na podstawie dostarczonych bajtów audio.
+        Makes mood predictions based on provided audio bytes.
         """
         if self.model is None:
             return []
@@ -87,15 +115,19 @@ class AudioModelHandler:
 
         try:
             predictions = self.model.predict(spectrogram)[0]
-            
-            # Powiązanie predykcji z etykietami i sortowanie
-            results = [{"mood": label, "score": float(score)} for label, score in zip(CLASS_LABELS, predictions)]
-            sorted_results = sorted(results, key=lambda x: x['score'], reverse=True)
-            
+
+            # Associate predictions with labels and sort
+            results = [
+                {"mood": label, "score": float(score)}
+                for label, score in zip(CLASS_LABELS, predictions)
+            ]
+            sorted_results = sorted(results, key=lambda x: x["score"], reverse=True)
+
             return sorted_results[:top_n]
         except Exception as e:
-            print(f"Błąd podczas predykcji modelu: {e}")
+            print(f"Error during model prediction: {e}")
             return []
 
-# Utworzenie pojedynczej instancji, która będzie używana w całej aplikacji
+
+# Create a single instance that will be used throughout the application
 mood_model_handler = AudioModelHandler()

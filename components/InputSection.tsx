@@ -72,7 +72,7 @@ const InputSection: React.FC<InputSectionProps> = ({
 
     if (oversizedFiles.length > 0) {
       const fileNames = oversizedFiles.map(f => `'${f.name}'`).join(', ');
-      showToast(`Pliki są za duże (limit 50MB): ${fileNames}`, 'error');
+      showToast(`Files are too large (limit 50MB): ${fileNames}`, 'error');
     }
 
     if (validFiles.length === 0) return;
@@ -87,7 +87,7 @@ const InputSection: React.FC<InputSectionProps> = ({
       const existingIds = new Set(prev.map(item => item.id));
       const uniqueNewItems = newItems.filter(newItem => !existingIds.has(newItem.id));
       if (uniqueNewItems.length > 0) {
-        showToast(`Dodano ${uniqueNewItems.length} nowych plików do kolejki.`, 'success');
+        showToast(`Added ${uniqueNewItems.length} new files to queue.`, 'success');
       }
       return [...prev, ...uniqueNewItems];
     });
@@ -129,8 +129,8 @@ const InputSection: React.FC<InputSectionProps> = ({
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="text-center">
-        <h2 className="text-2xl md:text-3xl font-bold text-light-text dark:text-dark-text">Przetwarzanie Wsadowe</h2>
-        <p className="text-slate-500 dark:text-slate-400 mt-1">Przeciągnij i upuść wiele plików, aby przeanalizować je wszystkie naraz.</p>
+        <h2 className="text-2xl md:text-3xl font-bold text-light-text dark:text-dark-text">Batch Processing</h2>
+        <p className="text-slate-500 dark:text-slate-400 mt-1">Drag and drop multiple files to analyze them all at once.</p>
       </div>
 
       <div
@@ -149,7 +149,7 @@ const InputSection: React.FC<InputSectionProps> = ({
         {isDragging ? (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-accent-violet/20 backdrop-blur-sm z-10 animate-fade-in">
             <Download className="w-16 h-16 text-accent-violet mb-4 animate-bounce" />
-            <p className="text-xl font-bold text-accent-violet">Upuść pliki tutaj</p>
+            <p className="text-xl font-bold text-accent-violet">Drop files here</p>
           </div>
         ) : (
           <label htmlFor="dropzone-file" className="flex flex-col items-center justify-center w-full h-full cursor-pointer z-0">
@@ -157,7 +157,7 @@ const InputSection: React.FC<InputSectionProps> = ({
               <Upload className="w-8 h-8 text-slate-500 dark:text-slate-400" />
             </div>
             <p className="mb-2 text-lg text-center text-slate-700 dark:text-slate-200 font-medium">
-              <span className="text-accent-blue hover:underline">Kliknij, by przesłać</span> lub przeciągnij pliki
+              <span className="text-accent-blue hover:underline">Click to upload</span> or drag files
             </p>
             <p className="text-sm text-slate-500 dark:text-slate-400">MP3, WAV, FLAC, M4A</p>
           </label>
@@ -168,7 +168,7 @@ const InputSection: React.FC<InputSectionProps> = ({
         <div className="space-y-4">
           <div>
             <div className="flex justify-between items-center mb-1">
-              <span className="text-sm font-semibold text-light-text dark:text-dark-text">Kolejka ({completedCount}/{totalCount})</span>
+              <span className="text-sm font-semibold text-light-text dark:text-dark-text">Queue ({completedCount}/{totalCount})</span>
               <span className="text-sm font-mono text-slate-500 dark:text-slate-400">{progress.toFixed(0)}%</span>
             </div>
             <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2.5 overflow-hidden">
@@ -179,7 +179,7 @@ const InputSection: React.FC<InputSectionProps> = ({
           {isProcessingBatch && (
             <div className="p-3 bg-yellow-100 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-800 text-yellow-800 dark:text-yellow-200 rounded-lg text-sm text-center font-medium flex items-center justify-center gap-2 animate-pulse">
               <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-              Trwa przetwarzanie... Proszę nie zamykać tej karty przeglądarki.
+              Processing... Please do not close this browser tab.
             </div>
           )}
 
@@ -202,9 +202,9 @@ const InputSection: React.FC<InputSectionProps> = ({
         <div className="flex-grow">
           <div className="flex items-center gap-2 mb-1">
             <Sparkles className="w-4 h-4 text-accent-violet" />
-            <label htmlFor="pro-mode-toggle" className="font-semibold text-light-text dark:text-dark-text cursor-pointer">Analiza Pro</label>
+            <label htmlFor="pro-mode-toggle" className="font-semibold text-light-text dark:text-dark-text cursor-pointer">Pro Analysis</label>
           </div>
-          <p className="text-sm text-slate-500 dark:text-slate-400">Dodaje szczegółową analizę instrumentarium, stylu wokalnego, struktury i zastosowań.</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">Adds detailed analysis of instrumentation, vocal style, structure and use cases.</p>
         </div>
         <div className="flex-shrink-0 self-end sm:self-center">
           <ToggleSwitch checked={isProMode} onChange={setIsProMode} />
@@ -214,18 +214,18 @@ const InputSection: React.FC<InputSectionProps> = ({
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Button onClick={onExportBatch} variant="secondary" size="lg" className="w-full" disabled={isProcessingBatch || completedCount === 0}>
           <Download className="w-6 h-6" />
-          Eksportuj CSV ({completedCount})
+          Export CSV ({completedCount})
         </Button>
         <Button onClick={onAnalyze} variant="primary" size="lg" className="w-full" disabled={isProcessingBatch || batch.filter(i => i.status === 'pending').length === 0}>
           {isProcessingBatch ? (
             <>
               <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-              Przetwarzanie...
+              Processing...
             </>
           ) : (
             <>
               <Music className="w-6 h-6" />
-              Analizuj Wsad ({batch.filter(i => i.status === 'pending').length})
+              Analyze Batch ({batch.filter(i => i.status === 'pending').length})
             </>
           )}
         </Button>

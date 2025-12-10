@@ -26,9 +26,9 @@ const EditableField: React.FC<{
 }> = ({ isEditing, value, onChange, multiline = false, placeholder, className }) => {
     if (isEditing) {
         if (multiline) {
-            return <textarea value={value || ''} onChange={(e) => onChange(e.target.value)} rows={3} className={`w-full p-2 bg-slate-100 dark:bg-slate-800 rounded-md text-sm border border-slate-300 dark:border-slate-600 focus:ring-accent-violet focus:border-accent-violet ${className}`} placeholder={placeholder}/>
+            return <textarea value={value || ''} onChange={(e) => onChange(e.target.value)} rows={3} className={`w-full p-2 bg-slate-100 dark:bg-slate-800 rounded-md text-sm border border-slate-300 dark:border-slate-600 focus:ring-accent-violet focus:border-accent-violet ${className}`} placeholder={placeholder} />
         }
-        return <input type="text" value={value || ''} onChange={(e) => onChange(e.target.value)} className={`w-full p-2 bg-slate-100 dark:bg-slate-800 rounded-md text-sm border border-slate-300 dark:border-slate-600 focus:ring-accent-violet focus:border-accent-violet ${className}`} placeholder={placeholder}/>
+        return <input type="text" value={value || ''} onChange={(e) => onChange(e.target.value)} className={`w-full p-2 bg-slate-100 dark:bg-slate-800 rounded-md text-sm border border-slate-300 dark:border-slate-600 focus:ring-accent-violet focus:border-accent-violet ${className}`} placeholder={placeholder} />
     }
     return <p className={`text-slate-600 dark:text-slate-300 ${multiline ? 'whitespace-pre-wrap' : ''} ${className}`}>{value || <span className="italic opacity-50">{placeholder || '-'}</span>}</p>
 };
@@ -49,7 +49,7 @@ const MetadataField: React.FC<{
                 <Tooltip text="Ulepsz z AI">
                     <button onClick={() => onRefine(field)} className="text-slate-400 hover:text-accent-violet transition-colors disabled:opacity-50" disabled={!!refiningField}>
                         {refiningField === field ? (
-                             <div className="w-4 h-4 border-2 border-accent-violet border-t-transparent rounded-full animate-spin"></div>
+                            <div className="w-4 h-4 border-2 border-accent-violet border-t-transparent rounded-full animate-spin"></div>
                         ) : (
                             <Sparkles className="w-4 h-4" />
                         )}
@@ -113,17 +113,17 @@ const EnergyMeter: React.FC<{ level: string }> = ({ level }) => {
     };
     const currentLevel = energyLevels[level] || 0;
     const colors = ['bg-sky-400', 'bg-yellow-400', 'bg-orange-400', 'bg-red-500'];
-    
+
     const [mounted, setMounted] = useState(false);
     useEffect(() => { setTimeout(() => setMounted(true), 500) }, []);
 
     return (
         <div className="w-full">
-            <h4 className="text-xs font-bold uppercase text-slate-500 dark:text-slate-400 tracking-wider mb-2 text-center">Energia</h4>
+            <h4 className="text-xs font-bold uppercase text-slate-500 dark:text-slate-400 tracking-wider mb-2 text-center">Energy</h4>
             <div className="flex h-3 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden gap-0.5">
                 {[...Array(4)].map((_, i) => (
-                    <div 
-                        key={i} 
+                    <div
+                        key={i}
                         className={`flex-1 h-full transition-all duration-700 ease-out transform ${i < currentLevel && mounted ? `${colors[i]} scale-100` : 'bg-transparent scale-90 opacity-0'}`}
                         style={{ transitionDelay: `${i * 150}ms` }}
                     ></div>
@@ -151,67 +151,67 @@ const SummaryCard: React.FC<SummaryCardProps> = ({ metadata, isEditing, onFieldU
                     <LayoutGrid className="w-6 h-6" />
                 </div>
                 <div>
-                    <h3 className="text-lg font-bold text-light-text dark:text-dark-text">Dane Utworu</h3>
-                    <p className="text-sm text-slate-500 dark:text-slate-400">Identyfikacja i charakterystyka.</p>
+                    <h3 className="text-lg font-bold text-light-text dark:text-dark-text">Track Data</h3>
+                    <p className="text-sm text-slate-500 dark:text-slate-400">Identification and characteristics.</p>
                 </div>
             </div>
 
             <div className="space-y-6">
                 {/* Identity Section */}
                 <div className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700/50 space-y-3">
-                    
+
                     {/* Title */}
                     <div className="flex items-start gap-3">
-                         <div className="mt-2 p-1.5 bg-slate-200 dark:bg-slate-800 rounded text-slate-400">
+                        <div className="mt-2 p-1.5 bg-slate-200 dark:bg-slate-800 rounded text-slate-400">
                             <Music className="w-4 h-4" />
                         </div>
                         <div className="flex-grow">
-                             <div className="flex justify-between items-center mb-1">
-                                <h4 className="text-xs font-bold uppercase text-slate-500 dark:text-slate-400 tracking-wider">Tytuł</h4>
-                                <Tooltip text="Zasugeruj tytuł">
+                            <div className="flex justify-between items-center mb-1">
+                                <h4 className="text-xs font-bold uppercase text-slate-500 dark:text-slate-400 tracking-wider">Title</h4>
+                                <Tooltip text="Suggest title">
                                     <button onClick={() => onRefine('title')} disabled={!!refiningField} className="text-slate-400 hover:text-accent-violet transition-colors">
                                         {refiningField === 'title' ? <div className="w-3 h-3 border-2 border-accent-violet border-t-transparent rounded-full animate-spin"></div> : <Sparkles className="w-3 h-3" />}
                                     </button>
                                 </Tooltip>
                             </div>
-                            <EditableField isEditing={isEditing} value={metadata.title || ''} onChange={(v) => onFieldUpdate('title', v)} className="font-bold text-lg md:text-xl text-light-text dark:text-dark-text" placeholder="Nieznany Tytuł" />
+                            <EditableField isEditing={isEditing} value={metadata.title || ''} onChange={(v) => onFieldUpdate('title', v)} className="font-bold text-lg md:text-xl text-light-text dark:text-dark-text" placeholder="Unknown Title" />
                         </div>
                     </div>
 
-                     {/* Artist */}
+                    {/* Artist */}
                     <div className="flex items-start gap-3">
                         <div className="mt-2 p-1.5 bg-slate-200 dark:bg-slate-800 rounded text-slate-400">
                             <User className="w-4 h-4" />
                         </div>
                         <div className="flex-grow">
                             <div className="flex justify-between items-center mb-1">
-                                <h4 className="text-xs font-bold uppercase text-slate-500 dark:text-slate-400 tracking-wider">Artysta</h4>
-                                <Tooltip text="Zasugeruj artystę">
+                                <h4 className="text-xs font-bold uppercase text-slate-500 dark:text-slate-400 tracking-wider">Artist</h4>
+                                <Tooltip text="Suggest artist">
                                     <button onClick={() => onRefine('artist')} disabled={!!refiningField} className="text-slate-400 hover:text-accent-violet transition-colors">
                                         {refiningField === 'artist' ? <div className="w-3 h-3 border-2 border-accent-violet border-t-transparent rounded-full animate-spin"></div> : <Sparkles className="w-3 h-3" />}
                                     </button>
                                 </Tooltip>
                             </div>
-                            <EditableField isEditing={isEditing} value={metadata.artist || ''} onChange={(v) => onFieldUpdate('artist', v)} className="font-semibold text-base" placeholder="Nieznany Artysta" />
+                            <EditableField isEditing={isEditing} value={metadata.artist || ''} onChange={(v) => onFieldUpdate('artist', v)} className="font-semibold text-base" placeholder="Unknown Artist" />
                         </div>
                     </div>
 
-                     {/* Album & Year */}
+                    {/* Album & Year */}
                     <div className="flex gap-4">
                         <div className="flex-1">
-                             <div className="flex justify-between items-center mb-1">
+                            <div className="flex justify-between items-center mb-1">
                                 <h4 className="text-xs font-bold uppercase text-slate-500 dark:text-slate-400 tracking-wider">Album</h4>
                                 <button onClick={() => onRefine('album')} disabled={!!refiningField} className="text-slate-400 hover:text-accent-violet">
-                                     {refiningField === 'album' ? <div className="w-3 h-3 border-2 border-accent-violet border-t-transparent rounded-full animate-spin"></div> : <Sparkles className="w-3 h-3" />}
+                                    {refiningField === 'album' ? <div className="w-3 h-3 border-2 border-accent-violet border-t-transparent rounded-full animate-spin"></div> : <Sparkles className="w-3 h-3" />}
                                 </button>
                             </div>
-                            <EditableField isEditing={isEditing} value={metadata.album || ''} onChange={(v) => onFieldUpdate('album', v)} placeholder="Singiel / Album" className="text-sm" />
+                            <EditableField isEditing={isEditing} value={metadata.album || ''} onChange={(v) => onFieldUpdate('album', v)} placeholder="Single / Album" className="text-sm" />
                         </div>
-                         <div className="w-24 flex-shrink-0">
-                             <div className="flex justify-between items-center mb-1">
-                                <h4 className="text-xs font-bold uppercase text-slate-500 dark:text-slate-400 tracking-wider">Rok</h4>
+                        <div className="w-24 flex-shrink-0">
+                            <div className="flex justify-between items-center mb-1">
+                                <h4 className="text-xs font-bold uppercase text-slate-500 dark:text-slate-400 tracking-wider">Year</h4>
                                 <button onClick={() => onRefine('year')} disabled={!!refiningField} className="text-slate-400 hover:text-accent-violet">
-                                     {refiningField === 'year' ? <div className="w-3 h-3 border-2 border-accent-violet border-t-transparent rounded-full animate-spin"></div> : <Sparkles className="w-3 h-3" />}
+                                    {refiningField === 'year' ? <div className="w-3 h-3 border-2 border-accent-violet border-t-transparent rounded-full animate-spin"></div> : <Sparkles className="w-3 h-3" />}
                                 </button>
                             </div>
                             <div className="flex items-center gap-2">
@@ -230,9 +230,9 @@ const SummaryCard: React.FC<SummaryCardProps> = ({ metadata, isEditing, onFieldU
                     <div className="md:col-span-2 space-y-4">
                         <EnergyMeter level={metadata.energyLevel} />
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                             <MetadataField label="Tonacja" value={`${metadata.key} ${metadata.mode}`} field="key" {...{isEditing, onFieldUpdate, refiningField, onRefine}} />
-                             <MetadataField label="Instrument" value={metadata.mainInstrument} field="mainInstrument" {...{isEditing, onFieldUpdate, refiningField, onRefine}} />
-                             <MetadataField label="Charakter" value={metadata.tempoCharacter} field="tempoCharacter" {...{isEditing, onFieldUpdate, refiningField, onRefine}} />
+                            <MetadataField label="Key" value={`${metadata.key} ${metadata.mode}`} field="key" {...{ isEditing, onFieldUpdate, refiningField, onRefine }} />
+                            <MetadataField label="Instrument" value={metadata.mainInstrument} field="mainInstrument" {...{ isEditing, onFieldUpdate, refiningField, onRefine }} />
+                            <MetadataField label="Character" value={metadata.tempoCharacter} field="tempoCharacter" {...{ isEditing, onFieldUpdate, refiningField, onRefine }} />
                         </div>
                     </div>
                 </div>
@@ -240,8 +240,8 @@ const SummaryCard: React.FC<SummaryCardProps> = ({ metadata, isEditing, onFieldU
                 {/* Description (Comment) */}
                 <div>
                     <div className="flex justify-between items-center mb-1">
-                         <h4 className="text-xs font-bold uppercase text-slate-500 dark:text-slate-400 tracking-wider">Opis / Komentarz</h4>
-                        <Tooltip text="Ulepsz z AI">
+                        <h4 className="text-xs font-bold uppercase text-slate-500 dark:text-slate-400 tracking-wider">Description / Comment</h4>
+                        <Tooltip text="Refine with AI">
                             <button onClick={() => onRefine('trackDescription')} className="text-slate-400 hover:text-accent-violet transition-colors disabled:opacity-50" disabled={!!refiningField}>
                                 {refiningField === 'trackDescription' ? (
                                     <div className="w-4 h-4 border-2 border-accent-violet border-t-transparent rounded-full animate-spin"></div>
@@ -251,7 +251,7 @@ const SummaryCard: React.FC<SummaryCardProps> = ({ metadata, isEditing, onFieldU
                             </button>
                         </Tooltip>
                     </div>
-                    <EditableField isEditing={isEditing} value={metadata.trackDescription} onChange={(v) => onFieldUpdate('trackDescription', v)} multiline placeholder="Opis utworu..."/>
+                    <EditableField isEditing={isEditing} value={metadata.trackDescription} onChange={(v) => onFieldUpdate('trackDescription', v)} multiline placeholder="Track description..." />
                 </div>
             </div>
 
@@ -259,21 +259,21 @@ const SummaryCard: React.FC<SummaryCardProps> = ({ metadata, isEditing, onFieldU
                 <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
                     <div className="bg-light-card dark:bg-dark-card p-6 rounded-2xl shadow-2xl w-full max-w-md border border-slate-200 dark:border-slate-700 relative animate-slide-up">
                         <div className="flex justify-between items-center mb-4">
-                            <h5 className="text-lg font-bold text-light-text dark:text-dark-text">Ulepsz "{refinePopup.field}"</h5>
+                            <h5 className="text-lg font-bold text-light-text dark:text-dark-text">Refine "{refinePopup.field}"</h5>
                             <button onClick={onCloseRefinePopup} className="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"><X className="w-5 h-5 text-slate-500" /></button>
                         </div>
-                        
+
                         <div className="mb-4">
-                            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Obecna wartość:</span>
+                            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Current value:</span>
                             <div className="text-sm text-slate-600 dark:text-slate-300 italic mt-1 bg-slate-50 dark:bg-slate-900/50 p-3 rounded-lg border border-slate-200 dark:border-slate-800 max-h-24 overflow-y-auto">
-                                {Array.isArray(metadata[refinePopup.field]) 
-                                    ? (metadata[refinePopup.field] as any[]).join(', ') 
-                                    : String(metadata[refinePopup.field] || 'Brak')}
+                                {Array.isArray(metadata[refinePopup.field])
+                                    ? (metadata[refinePopup.field] as any[]).join(', ')
+                                    : String(metadata[refinePopup.field] || 'None')}
                             </div>
                         </div>
 
                         <div className="mb-2">
-                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Instrukcja dla AI:</label>
+                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Instruction for AI:</label>
                         </div>
                         <textarea
                             value={popupInstruction}
@@ -285,7 +285,7 @@ const SummaryCard: React.FC<SummaryCardProps> = ({ metadata, isEditing, onFieldU
                             onClick={() => onConfirmRefine(refinePopup.field, popupInstruction)}
                             className="w-full mt-4 flex items-center justify-center gap-2 px-4 py-3 text-sm font-bold text-white bg-gradient-to-r from-accent-violet to-accent-blue rounded-lg hover:opacity-90 transition-all hover:shadow-lg hover:scale-[1.02]"
                         >
-                           <Check className="w-5 h-5" /> Zatwierdź i Generuj
+                            <Check className="w-5 h-5" /> Confirm and Generate
                         </button>
                     </div>
                 </div>

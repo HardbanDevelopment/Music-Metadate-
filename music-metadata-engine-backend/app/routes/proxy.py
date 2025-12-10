@@ -4,6 +4,7 @@ import httpx
 
 router = APIRouter()
 
+
 @router.post("/proxy/gemini")
 async def proxy_gemini(request: Request):
     body = await request.json()
@@ -12,6 +13,6 @@ async def proxy_gemini(request: Request):
         response = await client.post(
             "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent",
             json=body,
-            headers=headers
+            headers=headers,
         )
     return response.json()

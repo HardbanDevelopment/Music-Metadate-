@@ -21,7 +21,7 @@ const IdentificationCard: React.FC<IdentificationCardProps> = ({ metadata, fileN
 
     const handleAudDSearch = async () => {
         if (!uploadedFile) {
-            showToast("Brak pliku audio do weryfikacji.", 'error');
+            showToast("No audio file to verify.", 'error');
             return;
         }
         setIsAudDSearching(true);
@@ -33,7 +33,7 @@ const IdentificationCard: React.FC<IdentificationCardProps> = ({ metadata, fileN
         try {
             const res = await fetch('/analysis/identify', { method: 'POST', body: formData });
 
-            if (!res.ok) throw new Error("Usługa niedostępna lub błąd Backend.");
+            if (!res.ok) throw new Error("Service unavailable or Backend error.");
 
             const json = await res.json();
             if (json.status === 'success' && json.result) {
@@ -48,13 +48,13 @@ const IdentificationCard: React.FC<IdentificationCardProps> = ({ metadata, fileN
                     copyright: r.label ? `(C) ${r.label}` : undefined
                 };
                 setAudDResult(match);
-                showToast("Znaleziono wpis w bazie praw autorskich (AudD).", 'success');
+                showToast("Found entry in copyright database (AudD).", 'success');
             } else {
-                showToast("Nie znaleziono utworu w bazie AudD (Czysty Copyright).", 'info');
+                showToast("Track not found in AudD database (Clean Copyright).", 'info');
             }
         } catch (e) {
             console.error(e);
-            showToast("Błąd weryfikacji AudD. Sprawdź backend.", 'error');
+            showToast("AudD verification error. Check backend.", 'error');
         } finally {
             setIsAudDSearching(false);
         }
@@ -63,7 +63,7 @@ const IdentificationCard: React.FC<IdentificationCardProps> = ({ metadata, fileN
     const handleAudDApply = () => {
         if (audDResult) {
             onUpdateMetadata(audDResult);
-            showToast("Zaimportowano dane o prawach autorskich.", 'success');
+            showToast("Imported copyright data.", 'success');
             setAudDResult(null);
         }
     };
@@ -76,14 +76,14 @@ const IdentificationCard: React.FC<IdentificationCardProps> = ({ metadata, fileN
                         <Shield className="w-6 h-6" />
                     </div>
                     <div>
-                        <h3 className="text-lg font-bold text-light-text dark:text-dark-text">Weryfikacja Praw (AudD)</h3>
+                        <h3 className="text-lg font-bold text-light-text dark:text-dark-text">Rights Verification (AudD)</h3>
                         <p className="text-sm text-slate-500 dark:text-slate-400">
-                            Sprawdź status praw autorskich i komercyjną identyfikację.
+                            Check copyright status and commercial identification.
                         </p>
                     </div>
                 </div>
                 <button onClick={() => setIsOpen(!isOpen)} className="text-xs font-semibold text-accent-violet hover:underline">
-                    {isOpen ? 'Zwiń' : 'Rozwiń'}
+                    {isOpen ? 'Collapse' : 'Expand'}
                 </button>
             </div>
 
@@ -92,17 +92,17 @@ const IdentificationCard: React.FC<IdentificationCardProps> = ({ metadata, fileN
                     <div className="text-center py-4 bg-purple-50 dark:bg-purple-900/10 rounded-lg border border-purple-100 dark:border-purple-900/30 mb-4">
                         <Shield className="w-10 h-10 text-purple-500 mx-auto mb-2" />
                         <p className="text-xs text-slate-500 mb-3 px-4">
-                            Analiza próbki audio w bazie AudD Enterprise.
+                            Audio sample analysis in AudD Enterprise database.
                         </p>
                         <Button onClick={handleAudDSearch} disabled={isAudDSearching || !uploadedFile} size="sm" variant="primary" className="mx-auto bg-purple-600 hover:bg-purple-700 border-none">
                             {isAudDSearching ? (
                                 <>
                                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                                    Weryfikacja...
+                                    Verifying...
                                 </>
                             ) : (
                                 <>
-                                    <Shield className="w-4 h-4" /> Sprawdź Prawa
+                                    <Shield className="w-4 h-4" /> Check Rights
                                 </>
                             )}
                         </Button>
@@ -112,14 +112,14 @@ const IdentificationCard: React.FC<IdentificationCardProps> = ({ metadata, fileN
                         <div className="bg-green-50 dark:bg-green-900/20 p-3 rounded-lg border border-green-200 dark:border-green-800 animate-toast-in">
                             <div className="flex justify-between items-start">
                                 <div>
-                                    <p className="text-xs font-bold text-green-600 dark:text-green-400 uppercase mb-1">Znaleziono w AudD</p>
+                                    <p className="text-xs font-bold text-green-600 dark:text-green-400 uppercase mb-1">Found in AudD</p>
                                     <p className="font-bold text-light-text dark:text-dark-text">{audDResult.title}</p>
                                     <p className="text-sm text-slate-600 dark:text-slate-400">{audDResult.artist}</p>
                                     <p className="text-xs text-slate-500 mt-1">{audDResult.label}</p>
                                     <p className="text-xs text-slate-500">{audDResult.isrc}</p>
                                 </div>
                                 <Button onClick={handleAudDApply} size="sm" variant="secondary">
-                                    <CheckCircle2 className="w-4 h-4 text-green-500" /> Użyj
+                                    <CheckCircle2 className="w-4 h-4 text-green-500" /> Use
                                 </Button>
                             </div>
                         </div>

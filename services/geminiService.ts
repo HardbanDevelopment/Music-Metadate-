@@ -198,88 +198,30 @@ export const generateMetadata = async (
     if (inputType !== 'file' || !file) {
         throw new Error("Only file uploads are currently supported.");
     }
+
     try {
-        console.log("Analyzing with Puter.js...");
-        // --- HELPER: Backend MIR Analysis ---
-        async function analyzeWithBackendMIR(file: File): Promise<any> {
-            const formData = new FormData();
-            formData.append('file', file);
-            try {
-                const response = await fetch('http://localhost:8000/mir/analyze', {
-                    method: 'POST',
-                    body: formData,
-                });
-                if (!response.ok) {
-                    console.warn('MIR Service unavailable, falling back to pure AI analysis.');
-                    return null;
-                }
-                return await response.json();
-            } catch (e) {
-                console.error('MIR Analysis Error:', e);
-                return null;
-            }
-        }
-        // 1. Prepare audio for AI (Client Side)
-        const processedFile = await optimizeAudio(file);
-        const base64Audio = await new Promise<string>((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve(reader.result as string);
-            reader.onerror = reject;
-            reader.readAsDataURL(processedFile);
+        console.log("Starting analysis via Backend API...");
+
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('is_pro_mode', String(isProMode));
+
+        // Use the post helper but for formData we need to handle it slightly differently
+        // or just use fetch directly since we are sending a file
+        const response = await fetch('/analysis/generate', {
+            method: 'POST',
+            body: formData,
+            // Header for auth if needed, but for now assuming local dev
         });
-        // 2. Run Python MIR Analysis (Parallel or Pre-emptive)
-        let mirData = null;
-        try {
-            mirData = await analyzeWithBackendMIR(file);
-        } catch (e) {
-            console.log("Skipping MIR analysis (backend offline or error)");
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({ detail: 'Analysis failed on server.' }));
+            throw new Error(errorData.detail || `Server error: ${response.status}`);
         }
-        // 3. Construct Prompt
-        let dynamicPrompt = SYSTEM_PROMPT;
-        if (mirData) {
-            const mirDescription = `
-        TECHNICAL ANALYSIS (SCIENTIFIC DATA - USE THIS AS TRUTH):
-        - BPM: ${mirData.bpm}
-        - Key: ${mirData.key}
-        - Duration: ${mirData.duration}s
-        - Spectral Brightness (Centroid): ${mirData.technical?.spectral_centroid}
-        - Danceability Score: ${mirData.technical?.danceability_score}
-        
-        INSTRUCTIONS:
-        - Use the provided BPM and Key. Do NOT guess them.
-        - Use the spectral features to describe the Mood (Bright/Dark).
-        - Use danceability to refine Genre classification (e.g. if high -> Club/Dance).
-        `;
-            dynamicPrompt = mirDescription + "\n" + SYSTEM_PROMPT;
-        }
-        // 4. Call Puter.js AI
-        // @ts-ignore
-        if (!window.puter || !window.puter.ai) {
-            throw new Error("Puter.js AI library is not initialized.");
-        }
-        // @ts-ignore
-        const response = await window.puter.ai.chat(
-            dynamicPrompt,
-            base64Audio.split(',')[1]
-        );
-        // 5. Parse response
-        const jsonStr = response.message.content.replace(/```json|```/g, '').trim();
-        const data = JSON.parse(jsonStr);
-        // 6. Merge/Override with Scientific Data
-        if (mirData) {
-            data.bpm = mirData.bpm;
-            data.key = mirData.key;
-            data.danceability = mirData.technical?.danceability_score;
-            data.spectral_centroid = mirData.technical?.spectral_centroid;
-            data.spectral_rolloff = mirData.technical?.spectral_rolloff;
-            data.duration = mirData.duration;
-        }
-        // Post‑processing
-        data.additionalGenres = deduplicateArray(data.additionalGenres);
-        data.moods = deduplicateArray(data.moods);
-        data.instrumentation = deduplicateArray(data.instrumentation);
-        data.keywords = deduplicateArray(data.keywords);
+
+        const data = await response.json();
         return data as Metadata;
+
     } catch (error) {
         console.error("Metadata generation failed:", error);
         throw error;

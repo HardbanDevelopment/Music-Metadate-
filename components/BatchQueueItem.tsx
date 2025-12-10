@@ -14,13 +14,13 @@ interface BatchQueueItemProps {
 const StatusIndicator: React.FC<{ status: BatchItem['status'] }> = ({ status }) => {
     switch (status) {
         case 'pending':
-            return <div className="flex items-center gap-1.5 text-xs text-slate-500"><Clock className="w-3.5 h-3.5" /> Oczekuje</div>;
+            return <div className="flex items-center gap-1.5 text-xs text-slate-500"><Clock className="w-3.5 h-3.5" /> Pending</div>;
         case 'processing':
-            return <div className="flex items-center gap-1.5 text-xs text-blue-500"><div className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin"></div> Analizowanie</div>;
+            return <div className="flex items-center gap-1.5 text-xs text-blue-500"><div className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin"></div> Analyzing</div>;
         case 'completed':
-            return <div className="flex items-center gap-1.5 text-xs text-green-500"><CheckCircle2 className="w-3.5 h-3.5" /> Ukończono</div>;
+            return <div className="flex items-center gap-1.5 text-xs text-green-500"><CheckCircle2 className="w-3.5 h-3.5" /> Completed</div>;
         case 'error':
-            return <div className="flex items-center gap-1.5 text-xs text-red-500"><XCircle className="w-3.5 h-3.5" /> Błąd</div>;
+            return <div className="flex items-center gap-1.5 text-xs text-red-500"><XCircle className="w-3.5 h-3.5" /> Error</div>;
         default:
             return null;
     }
@@ -42,19 +42,19 @@ const BatchQueueItem: React.FC<BatchQueueItemProps> = ({ item, onRemove, onRetry
             <div className="flex-shrink-0 flex items-center gap-2">
                 {item.status === 'completed' && (
                     <Button onClick={() => onViewResults(item.id)} variant="primary" size="sm">
-                        <BarChart className="w-4 h-4" /> Zobacz
+                        <BarChart className="w-4 h-4" /> View
                     </Button>
                 )}
-                 {item.status === 'error' && (
+                {item.status === 'error' && (
                     <Button onClick={() => onRetry(item.id)} variant="secondary" size="sm" disabled={isProcessingBatch}>
-                        <RefreshCw className="w-4 h-4" /> Ponów
+                        <RefreshCw className="w-4 h-4" /> Retry
                     </Button>
                 )}
-                 <button 
-                    onClick={() => onRemove(item.id)} 
+                <button
+                    onClick={() => onRemove(item.id)}
                     className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-500/10 rounded-full disabled:opacity-50"
                     disabled={isProcessingBatch}
-                    aria-label="Usuń z kolejki"
+                    aria-label="Remove from queue"
                 >
                     <X className="w-4 h-4" />
                 </button>

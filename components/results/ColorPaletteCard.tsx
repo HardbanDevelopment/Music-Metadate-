@@ -16,7 +16,7 @@ const ColorPaletteCard: React.FC<ColorPaletteCardProps> = ({ palette, descriptio
 
   const handleCopy = (hex: string) => {
     navigator.clipboard.writeText(hex);
-    showToast(`Skopiowano kolor ${hex}!`);
+    showToast(`Copied color ${hex}!`);
   };
 
   return (
@@ -26,8 +26,8 @@ const ColorPaletteCard: React.FC<ColorPaletteCardProps> = ({ palette, descriptio
           <Palette className="w-6 h-6" />
         </div>
         <div>
-          <h3 className="text-lg font-bold text-light-text dark:text-dark-text">Paleta Kolorów</h3>
-          <p className="text-sm text-slate-500 dark:text-slate-400">Wizualna tożsamość utworu.</p>
+          <h3 className="text-lg font-bold text-light-text dark:text-dark-text">Color Palette</h3>
+          <p className="text-sm text-slate-500 dark:text-slate-400">Visual identity of the track.</p>
         </div>
       </div>
 
@@ -35,7 +35,7 @@ const ColorPaletteCard: React.FC<ColorPaletteCardProps> = ({ palette, descriptio
         {isGenerating ? (
           <div className="flex flex-col items-center justify-center text-center space-y-4 py-10">
             <div className="w-12 h-12 border-4 border-accent-violet border-t-transparent rounded-full animate-spin"></div>
-            <p className="font-semibold text-light-text dark:text-dark-text">Tworzę paletę...</p>
+            <p className="font-semibold text-light-text dark:text-dark-text">Creating palette...</p>
           </div>
         ) : palette ? (
           <div className="animate-fade-in space-y-3">
@@ -54,15 +54,15 @@ const ColorPaletteCard: React.FC<ColorPaletteCardProps> = ({ palette, descriptio
           </div>
         ) : (
           <div className="text-center p-4">
-             <Palette className="w-12 h-12 text-slate-400 dark:text-slate-500 mx-auto" />
-             <p className="text-sm text-slate-500 dark:text-slate-400 mt-2 mb-4">
-               Wygeneruj paletę kolorów pasującą do nastroju Twojej muzyki.
-             </p>
+            <Palette className="w-12 h-12 text-slate-400 dark:text-slate-500 mx-auto" />
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-2 mb-4">
+              Generate a color palette matching the mood of your music.
+            </p>
           </div>
         )}
 
         <Button onClick={onGenerate} disabled={isGenerating} variant={palette ? 'secondary' : 'primary'} size="sm" className="w-full">
-          {isGenerating ? 'Generowanie...' : palette ? <><RefreshCw className="w-4 h-4" /> Wygeneruj ponownie</> : <><Sparkles className="w-4 h-4" /> Generuj Paletę</>}
+          {isGenerating ? 'Generating...' : palette ? <><RefreshCw className="w-4 h-4" /> Regenerate</> : <><Sparkles className="w-4 h-4" /> Generate Palette</>}
         </Button>
       </div>
     </Card>

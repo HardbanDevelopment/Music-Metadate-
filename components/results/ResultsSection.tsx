@@ -32,7 +32,7 @@ const AUTOSAVE_KEY = 'music-metadata-autosave';
 
 const ErrorDisplay: React.FC<{ message: string }> = ({ message }) => (
   <div className="text-center py-16 animate-fade-in">
-    <p className="text-red-500 text-lg font-bold">Wystąpił błąd</p>
+    <p className="text-red-500 text-lg font-bold">An error occurred</p>
     <p className="text-slate-600 dark:text-slate-400 mt-2">{message}</p>
   </div>
 );
@@ -69,7 +69,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({ isLoading, error, resul
         if (parsedData.id === currentAnalysis.id) {
           setEditedResults(parsedData.metadata);
           setIsEditing(true);
-          showToast("Przywrócono niezapisane zmiany.", 'info');
+          showToast("Restored unsaved changes.", 'info');
         } else {
           setEditedResults(results);
           localStorage.removeItem(AUTOSAVE_KEY);
@@ -119,12 +119,12 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({ isLoading, error, resul
 
   const getRefinementInstruction = (field: keyof Metadata): string => {
     switch (field) {
-      case 'title': return "Zasugeruj chwytliwy i pasujący tytuł utworu.";
-      case 'artist': return "Zasugeruj nazwę artysty lub styl wykonawcy.";
+      case 'title': return "Suggest a catchy and fitting track title.";
+      case 'artist': return "Suggest an artist name or performance style.";
       case 'mainGenre': return "CRITICAL: Analyze the sonic characteristics. Provide ONE precise Main Genre.";
-      case 'trackDescription': return "Stwórz bogaty, sugestywny opis, podkreślając emocje i atmosferę.";
+      case 'trackDescription': return "Create a rich, evocative description, emphasizing emotions and atmosphere.";
       case 'moods': return `Analyze tempo and key to infer emotional mood. Provide 5-7 precise adjectives.`;
-      default: return `Zaproponuj lepszą wartość dla pola ${String(field)}.`;
+      default: return `Suggest a better value for the ${String(field)} field.`;
     }
   };
 
@@ -137,9 +137,9 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({ isLoading, error, resul
       const newResults = { ...editedResults, ...refinedPart };
       onUpdateResults(newResults);
       setEditedResults(newResults);
-      showToast(`Pole zostało ulepszone!`, 'success');
+      showToast(`Field has been refined!`, 'success');
     } catch (err) {
-      showToast("Wystąpił błąd podczas ulepszania.", 'error');
+      showToast("An error occurred during refinement.", 'error');
     } finally {
       setRefiningField(null);
     }
@@ -162,10 +162,10 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({ isLoading, error, resul
     try {
       const artIdea = await generateCoverArtIdea(results);
       // setCoverArtUrl(imageUrl); // Cover art generation is currently text-only (prompt)
-      showToast("Wygenerowano prompt okładki (zobacz konsolę)", 'success');
+      showToast("Generated cover art prompt (see console)", 'success');
       console.log("Generated Cover Art Prompt:", artIdea.visual_prompt);
     } catch (err) {
-      showToast("Nie udało się wygenerować okładki.", 'error');
+      showToast("Failed to generate cover art.", 'error');
     } finally {
       setIsGeneratingArt(false);
     }
@@ -177,14 +177,14 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({ isLoading, error, resul
     try {
       const content = await generateMarketingContent(results, type, tone);
       const titles = {
-        social: 'Post na Media Społecznościowe',
-        press: 'Notka Prasowa',
-        bio: 'Biografia na Platformy Streamingowe'
+        social: 'Social Media Post',
+        press: 'Press Release',
+        bio: 'Streaming Platform Bio'
       };
       setMarketingContent({ title: titles[type], content });
       setIsMarketingModalOpen(true);
     } catch (err) {
-      showToast("Nie udało się wygenerować treści.", 'error');
+      showToast("Failed to generate content.", 'error');
     } finally {
       setGeneratingMarketingType(null);
     }
@@ -192,7 +192,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({ isLoading, error, resul
 
   const handleEmbedMetadata = async () => {
     if (!uploadedFile) {
-      showToast("Brak pliku źródłowego do otagowania.", 'error');
+      showToast("No source file to tag.", 'error');
       return;
     }
     if (!editedResults) return;
@@ -200,9 +200,9 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({ isLoading, error, resul
     setIsTaggingFile(true);
     try {
       await embedMetadata(uploadedFile, editedResults, coverArtUrl);
-      showToast("Pobieranie otagowanego pliku rozpoczęte!", 'success');
+      showToast("Tagged file download started!", 'success');
     } catch (err) {
-      showToast("Wystąpił błąd podczas zapisywania tagów.", 'error');
+      showToast("An error occurred while saving tags.", 'error');
     } finally {
       setIsTaggingFile(false);
     }
@@ -210,9 +210,9 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({ isLoading, error, resul
 
   const handleCopyToClipboard = () => {
     const data = isEditing ? editedResults : results;
-    let textToCopy = `Tytuł: ${data.title}\nArtysta: ${data.artist}\nBPM: ${data.bpm}\nKlucz: ${data.key} ${data.mode}\nGatunek: ${data.mainGenre}`;
+    let textToCopy = `Title: ${data.title}\nArtist: ${data.artist}\nBPM: ${data.bpm}\nKey: ${data.key} ${data.mode}\nGenre: ${data.mainGenre}`;
     navigator.clipboard.writeText(textToCopy);
-    showToast("Skopiowano do schowka!", 'success');
+    showToast("Copied to clipboard!", 'success');
   };
 
   const isOriginalFileAvailable = uploadedFile && uploadedFile.size > 0 && currentAnalysis?.inputType === 'file';
@@ -227,11 +227,11 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({ isLoading, error, resul
           <Button onClick={onBackToBatch} variant="secondary" size="sm" className="px-2.5">
             <ArrowLeft className="w-5 h-5" />
           </Button>
-          <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-accent-violet to-accent-blue">Dashboard Analizy</h2>
+          <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-accent-violet to-accent-blue">Analysis Dashboard</h2>
         </div>
         {!isEditing && (
           <Button onClick={() => setIsEditing(true)} variant="secondary" size="sm" className="self-start sm:self-center">
-            <Pencil className="w-4 h-4" /> Edytuj
+            <Pencil className="w-4 h-4" /> Edit
           </Button>
         )}
       </div>
@@ -246,7 +246,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({ isLoading, error, resul
         </div>
       ) : (
         <div className="p-4 bg-slate-100 dark:bg-slate-800/50 rounded-lg text-center text-sm text-slate-500 dark:text-slate-400 animate-slide-up">
-          Odtwarzacz niedostępny.
+          Player unavailable.
         </div>
       )}
 
@@ -302,8 +302,8 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({ isLoading, error, resul
 
       {isEditing ? (
         <div className="flex justify-end gap-4 mt-8 animate-fade-in">
-          <Button onClick={handleCancel} variant="secondary">Anuluj</Button>
-          <Button onClick={handleSave} variant="primary">Zapisz Zmiany</Button>
+          <Button onClick={handleCancel} variant="secondary">Cancel</Button>
+          <Button onClick={handleSave} variant="primary">Save Changes</Button>
         </div>
       ) : (
         <div className="mt-8 space-y-4 animate-slide-up" style={{ animationDelay: '450ms' }}>
@@ -314,23 +314,23 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({ isLoading, error, resul
                   <FileSignature className="w-6 h-6" />
                 </div>
                 <div>
-                  <h4 className="font-bold text-lg text-light-text dark:text-dark-text">Gotowy Produkt?</h4>
+                  <h4 className="font-bold text-lg text-light-text dark:text-dark-text">Ready Product?</h4>
                   <p className="text-sm text-slate-600 dark:text-slate-300 mt-1">
-                    {isTaggingSupported ? `Zapisz metadane w pliku ${isWav ? 'WAV' : 'MP3'}.` : "Format nieobsługiwany."}
+                    {isTaggingSupported ? `Save metadata to ${isWav ? 'WAV' : 'MP3'} file.` : "Format not supported."}
                   </p>
                 </div>
               </div>
               <Button onClick={handleEmbedMetadata} disabled={isTaggingFile || !isTaggingSupported} variant="primary" className={`w-full sm:w-auto shadow-xl border-none px-6 py-3 ${isTaggingSupported ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-slate-400'}`}>
-                {isTaggingFile ? 'Zapisywanie...' : <><Download className="w-5 h-5" /> Pobierz Plik</>}
+                {isTaggingFile ? 'Saving...' : <><Download className="w-5 h-5" /> Download File</>}
               </Button>
             </div>
           )}
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-            <Button onClick={handleCopyToClipboard} variant="secondary" className="w-full"><Copy className="w-4 h-4" /> Kopiuj</Button>
+            <Button onClick={handleCopyToClipboard} variant="secondary" className="w-full"><Copy className="w-4 h-4" /> Copy</Button>
             <Button onClick={() => exportToJson(editedResults, 'metadata.json')} variant="secondary" className="w-full"><Download className="w-4 h-4" /> JSON</Button>
             <Button onClick={() => exportToCsv(editedResults, 'metadata.csv')} variant="secondary" className="w-full"><Download className="w-4 h-4" /> CSV</Button>
-            <Button onClick={onNewAnalysis} variant="primary" className="w-full"><RefreshCw className="w-4 h-4" /> Nowa Analiza</Button>
+            <Button onClick={onNewAnalysis} variant="primary" className="w-full"><RefreshCw className="w-4 h-4" /> New Analysis</Button>
           </div>
         </div>
       )}
@@ -340,7 +340,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({ isLoading, error, resul
           title={marketingContent.title}
           content={marketingContent.content}
           onClose={() => setIsMarketingModalOpen(false)}
-          onCopy={() => { navigator.clipboard.writeText(marketingContent.content); showToast("Skopiowano!", 'success'); }}
+          onCopy={() => { navigator.clipboard.writeText(marketingContent.content); showToast("Copied!", 'success'); }}
         />
       )}
     </div>

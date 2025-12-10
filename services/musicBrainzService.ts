@@ -19,9 +19,9 @@ export const searchMusicBrainz = async (query: string): Promise<MBRecording[]> =
     // Using Lucene search syntax for better results
     const encodedQuery = encodeURIComponent(query);
     const url = `${BASE_URL}/recording?query=${encodedQuery}&fmt=json&limit=5`;
-    
+
     const response = await fetch(url, { headers: HEADERS });
-    
+
     if (!response.ok) {
       throw new Error(`MusicBrainz API Error: ${response.statusText}`);
     }
@@ -30,7 +30,7 @@ export const searchMusicBrainz = async (query: string): Promise<MBRecording[]> =
     return data.recordings || [];
   } catch (error) {
     console.error("MusicBrainz search failed:", error);
-    throw new Error("Nie udało się przeszukać bazy MusicBrainz.");
+    throw new Error("Failed to search MusicBrainz database.");
   }
 };
 
@@ -41,7 +41,7 @@ export const getCoverArtUrl = async (releaseId: string): Promise<string | null> 
   try {
     const url = `${COVER_ART_ARCHIVE}/release/${releaseId}`;
     const response = await fetch(url);
-    
+
     if (response.ok) {
       const data = await response.json();
       // Prefer front cover, default to first image
@@ -60,15 +60,15 @@ export const getCoverArtUrl = async (releaseId: string): Promise<string | null> 
  */
 export const mapMBToMetadata = (recording: MBRecording): Partial<Metadata> => {
   const artistName = recording['artist-credit']?.[0]?.name || '';
-  
+
   // Find the best release (prefer ones with date)
   const release = recording.releases?.[0];
   const releaseDate = release?.date;
   const year = releaseDate ? releaseDate.substring(0, 4) : '';
-  
+
   const label = release?.['label-info']?.[0]?.label?.name;
   const catalogNumber = release?.['label-info']?.[0]?.['catalog-number'];
-  
+
   const isrc = recording.isrcs?.[0]?.id;
 
   return {

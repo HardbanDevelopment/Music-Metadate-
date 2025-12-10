@@ -12,7 +12,7 @@ const BASE_URL = 'https://api.lyrics.ovh/v1';
  */
 export const fetchLyrics = async (artist: string, title: string): Promise<LyricsResult> => {
     if (!artist || !title) {
-        throw new Error("Wymagany artysta i tytuł do wyszukania tekstu.");
+        throw new Error("Artist and title are required to search for lyrics.");
     }
 
     try {
@@ -21,26 +21,26 @@ export const fetchLyrics = async (artist: string, title: string): Promise<Lyrics
         const cleanTitle = title.replace(/\(.*\)/g, '').trim(); // Remove brackets info like (feat. X)
 
         const url = `${BASE_URL}/${encodeURIComponent(cleanArtist)}/${encodeURIComponent(cleanTitle)}`;
-        
+
         const response = await fetch(url);
-        
+
         if (response.status === 404) {
             throw new Error("Nie znaleziono tekstu dla tego utworu.");
         }
-        
+
         if (!response.ok) {
-            throw new Error(`Błąd API Lyrics.ovh: ${response.statusText}`);
+            throw new Error(`Lyrics.ovh API Error: ${response.statusText}`);
         }
 
         const data = await response.json();
-        
+
         if (data.lyrics) {
             return {
                 lyrics: data.lyrics,
                 source: 'Lyrics.ovh'
             };
         } else {
-            throw new Error("API zwróciło pusty tekst.");
+            throw new Error("API returned empty lyrics.");
         }
 
     } catch (error) {
@@ -48,7 +48,7 @@ export const fetchLyrics = async (artist: string, title: string): Promise<Lyrics
         return {
             lyrics: '',
             source: 'Error',
-            error: error instanceof Error ? error.message : "Nieznany błąd pobierania tekstu."
+            error: error instanceof Error ? error.message : "Unknown error fetching lyrics."
         };
     }
 };

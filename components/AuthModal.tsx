@@ -32,19 +32,19 @@ const AuthModal: React.FC<AuthModalProps> = ({ onClose, onSuccess, showToast }) 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.detail || 'Wystąpił nieznany błąd.');
+        throw new Error(data.detail || 'An unknown error occurred.');
       }
 
       if (view === 'signup') {
-        showToast('Rejestracja pomyślna! Sprawdź email, aby zweryfikować konto.', 'success');
+        showToast('Registration successful! Check your email to verify your account.', 'success');
         setView('signin'); // Switch to signin view after successful signup
       } else {
         onSuccess(data); // Pass the whole session object up
-        showToast('Zalogowano pomyślnie!', 'success');
+        showToast('Logged in successfully!', 'success');
         onClose();
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Wystąpił nieznany błąd.";
+      const errorMessage = error instanceof Error ? error.message : "An unknown error occurred.";
       showToast(errorMessage, 'error');
     } finally {
       setIsLoading(false);
@@ -60,10 +60,10 @@ const AuthModal: React.FC<AuthModalProps> = ({ onClose, onSuccess, showToast }) 
 
         <div className="text-center mb-6">
           <h2 className="text-2xl font-bold text-light-text dark:text-dark-text">
-            {view === 'signin' ? 'Witaj Ponownie' : 'Stwórz Konto'}
+            {view === 'signin' ? 'Welcome Back' : 'Create Account'}
           </h2>
           <p className="text-slate-500 dark:text-slate-400 mt-1">
-            {view === 'signin' ? 'Zaloguj się, aby kontynuować.' : 'Dołącz do nas i zacznij analizę.'}
+            {view === 'signin' ? 'Sign in to continue.' : 'Join us and start analyzing.'}
           </p>
         </div>
 
@@ -83,7 +83,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ onClose, onSuccess, showToast }) 
             <Lock className="w-5 h-5 text-slate-400 absolute top-1/2 left-3 -translate-y-1/2" />
             <input
               type="password"
-              placeholder="Hasło"
+              placeholder="Password"
               value={password}
               onChange={e => setPassword(e.target.value)}
               required
@@ -99,24 +99,24 @@ const AuthModal: React.FC<AuthModalProps> = ({ onClose, onSuccess, showToast }) 
             {isLoading ? (
               <>
                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                <span>Przetwarzanie...</span>
+                <span>Processing...</span>
               </>
             ) : (
               <>
                 <LogIn className="w-5 h-5" />
-                <span>{view === 'signin' ? 'Zaloguj się' : 'Zarejestruj się'}</span>
+                <span>{view === 'signin' ? 'Sign In' : 'Sign Up'}</span>
               </>
             )}
           </button>
         </form>
 
         <p className="text-center text-sm text-slate-500 dark:text-slate-400 mt-6">
-          {view === 'signin' ? "Nie masz konta?" : "Masz już konto?"}
+          {view === 'signin' ? "Don't have an account?" : "Already have an account?"}
           <button
             onClick={() => setView(view === 'signin' ? 'signup' : 'signin')}
             className="font-bold text-accent-violet hover:underline ml-1"
           >
-            {view === 'signin' ? 'Zarejestruj się' : 'Zaloguj się'}
+            {view === 'signin' ? 'Sign Up' : 'Sign In'}
           </button>
         </p>
       </div>

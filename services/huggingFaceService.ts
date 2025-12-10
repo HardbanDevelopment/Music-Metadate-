@@ -3,7 +3,7 @@ import { GoogleGenAI, Type } from "@google/genai";
 import { HFClassificationResult } from '../types';
 import { VOCAB_MAIN_GENRES, VOCAB_SUB_GENRES, VOCAB_MOODS, VOCAB_INSTRUMENTS } from './geminiService';
 
-// Używamy Gemini zamiast HF.
+// We use Gemini instead of HF.
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 // Helper: File to Base64
@@ -27,11 +27,11 @@ const fileToGenerativePart = async (file: File): Promise<{ inlineData: { data: s
 // Helper: Deduplicate results based on label text (case-insensitive)
 const deduplicateResults = (results: HFClassificationResult[]): HFClassificationResult[] => {
     const unique = new Map<string, HFClassificationResult>();
-    
+
     results.forEach(item => {
         // Normalize: remove distinct suffixes like " music", trim, lowercase
         const normalized = item.label.toLowerCase().replace(/ music$/i, '').trim();
-        
+
         if (!unique.has(normalized)) {
             unique.set(normalized, item);
         } else {
@@ -95,7 +95,7 @@ export interface SonicAnalysisResult {
 export const analyzeFullSonicContext = async (file: File): Promise<SonicAnalysisResult> => {
     try {
         const audioPart = await fileToGenerativePart(file);
-        
+
         const prompt = `
         Analyze this audio track comprehensively as a professional musicologist.
         
@@ -134,7 +134,7 @@ export const analyzeFullSonicContext = async (file: File): Promise<SonicAnalysis
 
         const text = response.text;
         if (!text) throw new Error("Empty response from AI");
-        
+
         const rawData = JSON.parse(text);
 
         return {
@@ -145,7 +145,7 @@ export const analyzeFullSonicContext = async (file: File): Promise<SonicAnalysis
 
     } catch (error) {
         console.error("Sonic Analysis Error:", error);
-        throw new Error("Błąd analizy sonicznej. Sprawdź połączenie.");
+        throw new Error("Sonic analysis error. Check your connection.");
     }
 };
 
@@ -169,4 +169,4 @@ export const detectInstruments = async (file: File, _token?: string): Promise<HF
 
 // Dummy functions
 export const getSavedHFToken = (): string => "";
-export const saveHFToken = (_token: string) => {};
+export const saveHFToken = (_token: string) => { };

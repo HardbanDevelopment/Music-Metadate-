@@ -60,7 +60,7 @@ export default function App() {
   const handleStartBatchProcessing = async () => {
     const itemsToProcess = batch.filter(item => item.status === 'pending');
     if (itemsToProcess.length === 0) {
-      showToast("Dodaj pliki do analizy.", 'info');
+      showToast("Add files to analyze.", 'info');
       return;
     }
 
@@ -69,7 +69,7 @@ export default function App() {
 
     for (let i = 0; i < itemsToProcess.length; i++) {
       const item = itemsToProcess[i];
-      
+
       // Add a delay between requests to be friendly to API rate limits
       // This prevents the "429 Resource Exhausted" error when processing many files.
       if (i > 0) {
@@ -89,33 +89,33 @@ export default function App() {
         setBatch(prev => prev.map(b => b.id === item.id ? { ...b, status: 'completed', metadata: results } : b));
       } catch (err) {
         failedCount++;
-        const errorMessage = err instanceof Error ? err.message : "Wystąpił nieznany błąd.";
+        const errorMessage = err instanceof Error ? err.message : "An unknown error occurred.";
         setBatch(prev => prev.map(b => b.id === item.id ? { ...b, status: 'error', error: errorMessage } : b));
       }
     }
 
     setIsProcessingBatch(false);
-    
+
     const completedCount = itemsToProcess.length - failedCount;
     const totalCount = itemsToProcess.length;
 
     if (failedCount > 0 && completedCount > 0) {
-        showToast(`Zakończono. ${completedCount} z ${totalCount} plików OK.`, 'info');
+      showToast(`Completed. ${completedCount} of ${totalCount} files OK.`, 'info');
     } else if (failedCount > 0 && completedCount === 0) {
-        showToast(`Wszystkie ${totalCount} pliki nie zostały przetworzone.`, 'error');
+      showToast(`All ${totalCount} files failed to process.`, 'error');
     } else {
-        showToast(`Przetwarzanie wsadowe zakończone pomyślnie!`, 'success');
+      showToast(`Batch processing completed successfully!`, 'success');
     }
   };
-  
+
   const handleExportBatch = () => {
     const completedItems = batch.filter(item => item.status === 'completed');
-    if(completedItems.length === 0) {
-      showToast("Brak ukończonych analiz do wyeksportowania.", 'info');
+    if (completedItems.length === 0) {
+      showToast("No completed analyses to export.", 'info');
       return;
     }
     exportBatchToCsv(completedItems);
-    showToast(`Wyeksportowano ${completedItems.length} utworów.`, 'success');
+    showToast(`Exported ${completedItems.length} tracks.`, 'success');
   };
 
   const handleViewResults = (itemId: string) => {
@@ -131,7 +131,7 @@ export default function App() {
     setActiveAnalysis(null);
     setView('analyze');
   };
-  
+
   const handleBackToBatch = () => {
     setActiveAnalysis(null);
     setView('analyze');
@@ -145,38 +145,38 @@ export default function App() {
     setBatch(prev => prev.map(b => b.id === activeAnalysis.id ? updatedItem : b));
 
     const recordToUpdate = analysisHistory.find(h => h.input.fileName === activeAnalysis.file.name);
-    if(recordToUpdate) {
-        setAnalysisHistory(prev => {
-          return prev.map(h => h.id === recordToUpdate.id ? { ...h, metadata: updatedMetadata } : h);
-        });
+    if (recordToUpdate) {
+      setAnalysisHistory(prev => {
+        return prev.map(h => h.id === recordToUpdate.id ? { ...h, metadata: updatedMetadata } : h);
+      });
     }
-    showToast("Metadane zaktualizowane!", 'success');
+    showToast("Metadata updated!", 'success');
   };
 
   const handleSelectHistoryItem = (record: AnalysisRecord) => {
-      const dummyFile = new File([], record.input.fileName || "history-item.mp3");
-      const batchItem: BatchItem = {
-          id: record.id,
-          file: dummyFile,
-          status: 'completed',
-          metadata: record.metadata,
-      };
-      setActiveAnalysis(batchItem);
-      setView('results');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+    const dummyFile = new File([], record.input.fileName || "history-item.mp3");
+    const batchItem: BatchItem = {
+      id: record.id,
+      file: dummyFile,
+      status: 'completed',
+      metadata: record.metadata,
+    };
+    setActiveAnalysis(batchItem);
+    setView('results');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleNavigate = (newView: View) => {
-      setView(newView);
+    setView(newView);
   };
 
 
   return (
     <div className="min-h-screen bg-light-bg dark:bg-dark-bg text-light-text dark:text-dark-text font-sans transition-colors duration-300 flex">
-      
-      <Sidebar 
-        currentView={view} 
-        onChangeView={setView} 
+
+      <Sidebar
+        currentView={view}
+        onChangeView={setView}
         onOpenAbout={() => setIsAboutModalOpen(true)}
         isOpenMobile={isMobileMenuOpen}
         onCloseMobile={() => setIsMobileMenuOpen(false)}
@@ -185,83 +185,83 @@ export default function App() {
       <div className="flex-1 flex flex-col lg:pl-64 min-w-0">
         {/* Mobile Header / Top Bar */}
         <div className="sticky top-0 z-30 bg-light-bg/80 dark:bg-dark-bg/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 py-3 flex justify-between items-center">
-             <div className="flex items-center gap-3">
-                <button onClick={() => setIsMobileMenuOpen(true)} className="lg:hidden p-2 -ml-2 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800">
-                    <Menu className="w-6 h-6" />
-                </button>
-                <h2 className="text-lg font-bold capitalize text-slate-700 dark:text-slate-200">
-                    {view === 'dashboard' ? 'Pulpit' : 
-                     view === 'analyze' ? 'Analiza Audio' :
-                     view === 'results' ? 'Wyniki Analizy' :
-                     view === 'history' ? 'Historia' : 'Narzędzia'}
-                </h2>
-             </div>
-             <Header theme={theme} toggleTheme={toggleTheme} />
+          <div className="flex items-center gap-3">
+            <button onClick={() => setIsMobileMenuOpen(true)} className="lg:hidden p-2 -ml-2 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800">
+              <Menu className="w-6 h-6" />
+            </button>
+            <h2 className="text-lg font-bold capitalize text-slate-700 dark:text-slate-200">
+              {view === 'dashboard' ? 'Dashboard' :
+                view === 'analyze' ? 'Audio Analysis' :
+                  view === 'results' ? 'Analysis Results' :
+                    view === 'history' ? 'History' : 'Tools'}
+            </h2>
+          </div>
+          <Header theme={theme} toggleTheme={toggleTheme} />
         </div>
 
         <main className="flex-grow p-4 lg:p-8">
-            {view === 'dashboard' && (
-                <DashboardHome onNavigate={handleNavigate} onCreateNew={handleNewAnalysis} />
-            )}
+          {view === 'dashboard' && (
+            <DashboardHome onNavigate={handleNavigate} onCreateNew={handleNewAnalysis} />
+          )}
 
-            {view === 'analyze' && (
-                <div className="max-w-5xl mx-auto">
-                    <div className="bg-light-card dark:bg-dark-card rounded-2xl shadow-lg p-6 md:p-8 border border-slate-200 dark:border-slate-800">
-                        <InputSection
-                            batch={batch}
-                            setBatch={setBatch}
-                            onAnalyze={handleStartBatchProcessing}
-                            isProMode={isProMode}
-                            setIsProMode={setIsProMode}
-                            isProcessingBatch={isProcessingBatch}
-                            onViewResults={handleViewResults}
-                            onExportBatch={handleExportBatch}
-                            showToast={showToast}
-                        />
-                    </div>
-                </div>
-            )}
+          {view === 'analyze' && (
+            <div className="max-w-5xl mx-auto">
+              <div className="bg-light-card dark:bg-dark-card rounded-2xl shadow-lg p-6 md:p-8 border border-slate-200 dark:border-slate-800">
+                <InputSection
+                  batch={batch}
+                  setBatch={setBatch}
+                  onAnalyze={handleStartBatchProcessing}
+                  isProMode={isProMode}
+                  setIsProMode={setIsProMode}
+                  isProcessingBatch={isProcessingBatch}
+                  onViewResults={handleViewResults}
+                  onExportBatch={handleExportBatch}
+                  showToast={showToast}
+                />
+              </div>
+            </div>
+          )}
 
-            {view === 'results' && activeAnalysis && (
-                 <div className="max-w-7xl mx-auto">
-                     <ResultsSection
-                        isLoading={false}
-                        error={null}
-                        results={activeAnalysis.metadata!}
-                        onNewAnalysis={handleNewAnalysis}
-                        showToast={showToast}
-                        onUpdateResults={handleUpdateResults}
-                        currentAnalysis={{
-                            id: activeAnalysis.id,
-                            metadata: activeAnalysis.metadata!,
-                            inputType: 'file',
-                            input: { fileName: activeAnalysis.file.name }
-                        }}
-                        uploadedFile={activeAnalysis.file}
-                        theme={theme}
-                        onBackToBatch={handleBackToBatch}
-                      />
-                </div>
-            )}
-            
-            {view === 'history' && (
-                <div className="max-w-4xl mx-auto">
-                    <HistoryPanel history={analysisHistory} onSelectItem={handleSelectHistoryItem} />
-                </div>
-            )}
+          {view === 'results' && activeAnalysis && (
+            <div className="max-w-7xl mx-auto">
+              <ResultsSection
+                isLoading={false}
+                error={null}
+                results={activeAnalysis.metadata!}
+                onNewAnalysis={handleNewAnalysis}
+                showToast={showToast}
+                onUpdateResults={handleUpdateResults}
+                currentAnalysis={{
+                  id: activeAnalysis.id,
+                  metadata: activeAnalysis.metadata!,
+                  inputType: 'file',
+                  input: { fileName: activeAnalysis.file.name }
+                }}
+                uploadedFile={activeAnalysis.file}
+                theme={theme}
+                onBackToBatch={handleBackToBatch}
+              />
+            </div>
+          )}
 
-            {view === 'tools' && (
-                 <div className="max-w-4xl mx-auto text-center py-20">
-                    <h3 className="text-2xl font-bold text-slate-400">Narzędzia</h3>
-                    <p className="text-slate-500 mt-2">Sekcja w budowie. Dostęp do narzędzi możliwy jest obecnie poprzez wyniki analizy.</p>
-                    <button onClick={handleNewAnalysis} className="mt-4 text-accent-violet hover:underline">Rozpocznij Analizę</button>
-                </div>
-            )}
+          {view === 'history' && (
+            <div className="max-w-4xl mx-auto">
+              <HistoryPanel history={analysisHistory} onSelectItem={handleSelectHistoryItem} />
+            </div>
+          )}
+
+          {view === 'tools' && (
+            <div className="max-w-4xl mx-auto text-center py-20">
+              <h3 className="text-2xl font-bold text-slate-400">Tools</h3>
+              <p className="text-slate-500 mt-2">Section under construction. Access to tools is currently available through analysis results.</p>
+              <button onClick={handleNewAnalysis} className="mt-4 text-accent-violet hover:underline">Start Analysis</button>
+            </div>
+          )}
         </main>
-        
-        <Footer 
-            onOpenLegal={(type) => setActiveLegalDoc(type)} 
-            onOpenResource={(type) => setActiveResourceDoc(type)}
+
+        <Footer
+          onOpenLegal={(type) => setActiveLegalDoc(type)}
+          onOpenResource={(type) => setActiveResourceDoc(type)}
         />
       </div>
 

@@ -36,7 +36,7 @@ describe('geminiService', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     process.env.API_KEY = 'test-key';
-    
+
     // Setup mock for GoogleGenAI constructor to return our mockGenerateContent
     (GoogleGenAI as unknown as { mockImplementation: (fn: any) => void }).mockImplementation(() => ({
       models: {
@@ -61,7 +61,7 @@ describe('geminiService', () => {
     });
 
     const dummyFile = new File(['audio data'], 'test.mp3', { type: 'audio/mpeg' });
-    
+
     const result = await generateMetadata('file', false, dummyFile, '', '');
 
     expect(mockGenerateContent).toHaveBeenCalledTimes(1);
@@ -78,6 +78,6 @@ describe('geminiService', () => {
     const dummyFile = new File(['audio data'], 'test.mp3', { type: 'audio/mpeg' });
 
     await expect(generateMetadata('file', false, dummyFile, '', ''))
-      .rejects.toThrow('Wystąpił problem z komunikacją z API');
+      .rejects.toThrow('API communication error occurred');
   });
 });

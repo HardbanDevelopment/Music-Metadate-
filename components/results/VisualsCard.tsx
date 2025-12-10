@@ -6,15 +6,15 @@ import Button from '../Button';
 import Tooltip from '../Tooltip';
 
 interface VisualsCardProps {
-  coverArtUrl: string | null;
-  isGeneratingArt: boolean;
-  onGenerateArt: () => void;
+    coverArtUrl: string | null;
+    isGeneratingArt: boolean;
+    onGenerateArt: () => void;
 }
 
 const VisualsCard: React.FC<VisualsCardProps> = ({
-  coverArtUrl, isGeneratingArt, onGenerateArt
+    coverArtUrl, isGeneratingArt, onGenerateArt
 }) => {
-    
+
     const handleDownloadArt = () => {
         if (!coverArtUrl) return;
         const link = document.createElement('a');
@@ -33,39 +33,39 @@ const VisualsCard: React.FC<VisualsCardProps> = ({
                     <Image className="w-6 h-6" />
                 </div>
                 <div>
-                    <h3 className="text-lg font-bold text-light-text dark:text-dark-text">Wizualizacje</h3>
-                    <p className="text-sm text-slate-500 dark:text-slate-400">Okładki Albumów (Imagen).</p>
+                    <h3 className="text-lg font-bold text-light-text dark:text-dark-text">Visualizations</h3>
+                    <p className="text-sm text-slate-500 dark:text-slate-400">Album Covers (Imagen).</p>
                 </div>
             </div>
-            
+
             <div className="space-y-8">
                 {/* Cover Art Section */}
                 <div className="text-center group">
-                    <h4 className="text-xs font-bold uppercase text-slate-500 mb-2">Okładka Albumu</h4>
+                    <h4 className="text-xs font-bold uppercase text-slate-500 mb-2">Album Cover</h4>
                     <div className="w-full aspect-square bg-slate-100 dark:bg-slate-800 rounded-lg flex items-center justify-center overflow-hidden relative mb-3 border border-slate-200 dark:border-slate-700 cursor-pointer">
                         {isGeneratingArt ? (
                             <div className="flex flex-col items-center justify-center text-center space-y-2">
                                 <div className="w-10 h-10 border-4 border-accent-violet border-t-transparent rounded-full animate-spin"></div>
-                                <p className="text-sm font-semibold">Generowanie Imagen 3...</p>
+                                <p className="text-sm font-semibold">Generating Imagen 3...</p>
                             </div>
                         ) : coverArtUrl ? (
                             <>
                                 <img src={coverArtUrl} alt="Generated album cover" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                                 <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                    <span className="text-white text-xs font-bold border border-white px-3 py-1 rounded-full backdrop-blur-sm">Podgląd</span>
+                                    <span className="text-white text-xs font-bold border border-white px-3 py-1 rounded-full backdrop-blur-sm">Preview</span>
                                 </div>
                             </>
                         ) : (
                             <Image className="w-16 h-16 text-slate-400 dark:text-slate-500 transition-transform duration-300 group-hover:scale-110 group-hover:text-slate-300" />
                         )}
                     </div>
-                     <div className="flex gap-2">
+                    <div className="flex gap-2">
                         <Button onClick={onGenerateArt} disabled={isGeneratingArt} variant="secondary" className="w-full text-xs">
-                            {isGeneratingArt ? 'Generowanie...' : coverArtUrl ? 'Ponów' : 'Generuj (Imagen)'}
+                            {isGeneratingArt ? 'Generating...' : coverArtUrl ? 'Retry' : 'Generate (Imagen)'}
                         </Button>
                         {coverArtUrl && !isGeneratingArt && (
-                            <Tooltip text="Pobierz okładkę">
-                                <Button onClick={handleDownloadArt} variant="primary" className="flex-shrink-0 px-3" aria-label="Pobierz okładkę">
+                            <Tooltip text="Download cover">
+                                <Button onClick={handleDownloadArt} variant="primary" className="flex-shrink-0 px-3" aria-label="Download cover">
                                     <Download className="w-5 h-5" />
                                 </Button>
                             </Tooltip>

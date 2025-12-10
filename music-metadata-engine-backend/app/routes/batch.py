@@ -3,6 +3,7 @@ from typing import List
 
 router = APIRouter()
 
+
 @router.post("/batch/analyze")
 async def batch_analyze(files: List[UploadFile] = File(...), user: str = Form(...)):
     # Placeholder: process each file, return dummy results

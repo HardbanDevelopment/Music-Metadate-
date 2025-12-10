@@ -3,7 +3,7 @@ const STORAGE_KEYS = {
     ISRC_PREFIX: 'mme_isrc_prefix',
     ISRC_SEQ: 'mme_isrc_sequence',
     CAT_SEQ: 'mme_cat_sequence',
-    CAT_PREFIX: 'mme_cat_prefix' // Domyślnie HRL, ale pozwalamy zmienić
+    CAT_PREFIX: 'mme_cat_prefix' // Default HRL, but allow changing
 };
 
 const DEFAULT_ISRC_PREFIX = 'PL-XXX'; // Placeholder
@@ -33,47 +33,47 @@ export const saveCodeConfig = (config: Partial<CodeConfig>) => {
 };
 
 /**
- * Generuje kolejny numer katalogowy w formacie PREFIX-ROK-NUMER (np. HRL-2024-001)
- * i inkrementuje licznik.
+ * Generates next catalog number in format PREFIX-YEAR-NUMBER (e.g. HRL-2024-001)
+ * and increments the counter.
  */
 export const generateNextCatalogNumber = (): string => {
     const config = getCodeConfig();
     const year = new Date().getFullYear();
-    
-    // Formatowanie numeru do 3 cyfr (001, 002...)
+
+    // Format number to 3 digits (001, 002...)
     const sequenceStr = config.nextCatSeq.toString().padStart(3, '0');
     const code = `${config.catPrefix}-${year}-${sequenceStr}`;
 
-    // Inkrementacja i zapis
+    // Increment and save
     saveCodeConfig({ nextCatSeq: config.nextCatSeq + 1 });
 
     return code;
 };
 
 /**
- * Generuje kolejny kod ISRC w formacie CC-XXX-YY-NNNNN
- * i inkrementuje licznik.
+ * Generates next ISRC code in format CC-XXX-YY-NNNNN
+ * and increments the counter.
  */
 export const generateNextISRC = (): string => {
     const config = getCodeConfig();
-    const yearShort = new Date().getFullYear().toString().slice(-2); // np. 24
-    
-    // Standard ISRC ma 5 cyfr na końcu
+    const yearShort = new Date().getFullYear().toString().slice(-2); // e.g. 24
+
+    // Standard ISRC has 5 digits at the end
     const sequenceStr = config.nextIsrcSeq.toString().padStart(5, '0');
-    
-    // config.isrcPrefix powinien być w formacie CC-XXX (Kraj-Rejestrant), np. PL-A12
-    // Usuwamy myślniki z prefiksu jeśli użytkownik je wpisał, aby zachować standard, 
-    // lub zostawiamy tak jak użytkownik woli. Tutaj zakładamy formatowanie inteligentne.
+
+    // config.isrcPrefix should be in format CC-XXX (Country-Registrant), e.g. PL-A12
+    // Remove dashes from prefix if user entered them to maintain standard,
+    // or leave as user prefers. Here we assume intelligent formatting.
     let cleanPrefix = config.isrcPrefix.toUpperCase();
-    
-    // Jeśli użytkownik nie ustawił własnego prefiksu, zwracamy placeholder do edycji
+
+    // If user did not set custom prefix, return placeholder for editing
     if (cleanPrefix === DEFAULT_ISRC_PREFIX || !cleanPrefix) {
         return `PL-XXX-${yearShort}-${sequenceStr}`;
     }
 
     const code = `${cleanPrefix}-${yearShort}-${sequenceStr}`;
 
-    // Inkrementacja i zapis
+    // Increment and save
     saveCodeConfig({ nextIsrcSeq: config.nextIsrcSeq + 1 });
 
     return code;

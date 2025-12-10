@@ -1,16 +1,55 @@
+# === Core Framework ===
 fastapi
 uvicorn
 python-dotenv
 httpx
-pydantic
-supabase
-sqlalchemy
-psycopg2-binary
-gotrue
-email-validator
+pydantic>=2.0.0
 python-multipart
-mutagen
-numpy
+
+# === Database ===
+supabase
+sqlalchemy>=2.0.0
+psycopg2-binary
+# gotrue is deprecated, using supabase-auth instead
+supabase-auth>=0.1.0
+email-validator
+
+# === AI / LLM ===
+groq
+openai-whisper
+google-generativeai
+
+# === Core Audio Analysis (librosa, madmom, pyAudioAnalysis) ===
 librosa
-google-generativeai
-google-generativeai
+numpy
+scipy
+scikit-learn
+# hmmlearn
+# madmom  # Uncomment if needed - requires specific setup
+# pyAudioAnalysis  # Uncomment if needed - requires ffmpeg
+
+# === Metadata ===
+mutagen
+tinytag
+
+# === Stem Separation ===
+spleeter
+
+# === Audio Embeddings ===
+# openl3  # Uncomment if needed - requires TensorFlow
+
+# === Pitch Detection ===
+crepe
+
+# === Loudness ===
+pyloudnorm
+soundfile
+
+# === Fingerprinting (Optional) ===
+# dejavu  # Uncomment if needed - requires PostgreSQL + ffmpeg
+
+# === Dev Tools ===
+ruff
+black
+pyright
+bandit

@@ -18,19 +18,19 @@ const AnalysisSourceCard: React.FC<AnalysisSourceCardProps> = ({ analysis }) => 
 
   if (inputType === 'idea') {
     icon = <Lightbulb className="w-5 h-5 text-accent-violet" />;
-    title = 'Wygenerowano na podstawie pomysłu';
+    title = 'Generated from idea';
     content = input.description;
   } else {
     icon = <Music className="w-5 h-5 text-accent-blue" />;
     if (input.fileName) {
-      title = 'Przeanalizowano plik';
+      title = 'Analyzed file';
       content = input.fileName;
     } else if (input.link) {
-      title = 'Przeanalizowano z linku';
+      title = 'Analyzed from link';
       content = input.link;
     } else {
-      title = 'Źródło analizy';
-      content = 'Nieznane źródło pliku';
+      title = 'Analysis source';
+      content = 'Unknown file source';
     }
   }
 
@@ -40,9 +40,9 @@ const AnalysisSourceCard: React.FC<AnalysisSourceCardProps> = ({ analysis }) => 
       <div>
         <h4 className="font-bold text-light-text dark:text-dark-text">{title}</h4>
         {content && (
-            <p className="text-sm text-slate-600 dark:text-slate-400 mt-1 italic break-all">
-                {inputType === 'idea' ? `"${content}"` : content}
-            </p>
+          <p className="text-sm text-slate-600 dark:text-slate-400 mt-1 italic break-all">
+            {inputType === 'idea' ? `"${content}"` : content}
+          </p>
         )}
       </div>
     </div>

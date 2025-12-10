@@ -26,9 +26,9 @@ const CopyrightCard: React.FC<CopyrightCardProps> = ({ metadata, file, showToast
         try {
             const h = await calculateFileHash(file);
             setHash(h);
-            showToast("Obliczono cyfrowy odcisk palca!", 'success');
+            showToast("Digital fingerprint calculated!", 'success');
         } catch (e) {
-            showToast("Błąd podczas obliczania skrótu pliku.", 'error');
+            showToast("Error calculating file hash.", 'error');
         } finally {
             setIsHashing(false);
         }
@@ -37,7 +37,7 @@ const CopyrightCard: React.FC<CopyrightCardProps> = ({ metadata, file, showToast
     const handleDownloadCertificate = () => {
         if (!hash || !file) return;
         generateCertificate(metadata, hash, file.name);
-        showToast("Pobrano certyfikat.", 'success');
+        showToast("Certificate downloaded.", 'success');
     };
 
     const handleGenerateWatermark = async () => {
@@ -46,15 +46,15 @@ const CopyrightCard: React.FC<CopyrightCardProps> = ({ metadata, file, showToast
         try {
             const url = await generateWatermarkedAudio(file);
             setWatermarkUrl(url);
-            
+
             // Create audio element for preview
             const audio = new Audio(url);
             audio.onended = () => setIsPlayingWatermark(false);
             setAudioElement(audio);
 
-            showToast("Wersja DEMO ze znakiem wodnym gotowa!", 'success');
+            showToast("DEMO version with watermark ready!", 'success');
         } catch (e) {
-            showToast("Błąd generowania znaku wodnego.", 'error');
+            showToast("Error generating watermark.", 'error');
             console.error(e);
         } finally {
             setIsWatermarking(false);
@@ -70,7 +70,7 @@ const CopyrightCard: React.FC<CopyrightCardProps> = ({ metadata, file, showToast
         }
         setIsPlayingWatermark(!isPlayingWatermark);
     };
-    
+
     const handleDownloadWatermark = () => {
         if (!watermarkUrl) return;
         const link = document.createElement('a');
@@ -79,7 +79,7 @@ const CopyrightCard: React.FC<CopyrightCardProps> = ({ metadata, file, showToast
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        showToast("Pobrano plik DEMO.", 'success');
+        showToast("DEMO file downloaded.", 'success');
     };
 
     return (
@@ -89,8 +89,8 @@ const CopyrightCard: React.FC<CopyrightCardProps> = ({ metadata, file, showToast
                     <Shield className="w-6 h-6" />
                 </div>
                 <div>
-                    <h3 className="text-lg font-bold text-light-text dark:text-dark-text">Ochrona Praw (Copyright)</h3>
-                    <p className="text-sm text-slate-500 dark:text-slate-400">Zabezpiecz swoje utwory przed kradzieżą.</p>
+                    <h3 className="text-lg font-bold text-light-text dark:text-dark-text">Copyright Protection</h3>
+                    <p className="text-sm text-slate-500 dark:text-slate-400">Protect your tracks from theft.</p>
                 </div>
             </div>
 
@@ -99,20 +99,20 @@ const CopyrightCard: React.FC<CopyrightCardProps> = ({ metadata, file, showToast
                 <div className="bg-slate-50 dark:bg-slate-900/30 p-4 rounded-lg border border-slate-200 dark:border-slate-800">
                     <div className="flex items-center gap-2 mb-3 text-emerald-600 dark:text-emerald-400">
                         <FileSignature className="w-5 h-5" />
-                        <h4 className="font-bold text-sm uppercase tracking-wide">Cyfrowy Odcisk (Proof of Existence)</h4>
+                        <h4 className="font-bold text-sm uppercase tracking-wide">Digital Fingerprint (Proof of Existence)</h4>
                     </div>
-                    
+
                     {!hash ? (
-                         <div className="text-center py-2">
-                            <p className="text-xs text-slate-500 mb-3">Oblicz unikalny skrót SHA-256 pliku, aby stworzyć kryptograficzny dowód jego istnienia w danym czasie.</p>
+                        <div className="text-center py-2">
+                            <p className="text-xs text-slate-500 mb-3">Calculate unique SHA-256 hash of the file to create cryptographic proof of its existence at a given time.</p>
                             <Button onClick={handleCalculateHash} disabled={isHashing || !file} size="sm" variant="secondary" className="w-full">
                                 {isHashing ? (
                                     <>
-                                        <div className="w-4 h-4 border-2 border-slate-500 border-t-transparent rounded-full animate-spin" /> Obliczanie...
+                                        <div className="w-4 h-4 border-2 border-slate-500 border-t-transparent rounded-full animate-spin" /> Calculating...
                                     </>
                                 ) : (
                                     <>
-                                        <Lock className="w-4 h-4" /> Oblicz Hash
+                                        <Lock className="w-4 h-4" /> Calculate Hash
                                     </>
                                 )}
                             </Button>
@@ -123,53 +123,53 @@ const CopyrightCard: React.FC<CopyrightCardProps> = ({ metadata, file, showToast
                                 {hash}
                             </div>
                             <Button onClick={handleDownloadCertificate} size="sm" variant="primary" className="w-full bg-emerald-600 hover:bg-emerald-700 text-white border-none">
-                                <Stamp className="w-4 h-4" /> Pobierz Certyfikat
+                                <Stamp className="w-4 h-4" /> Download Certificate
                             </Button>
                         </div>
                     )}
                 </div>
 
                 {/* Watermark Section */}
-                 <div className="bg-slate-50 dark:bg-slate-900/30 p-4 rounded-lg border border-slate-200 dark:border-slate-800">
+                <div className="bg-slate-50 dark:bg-slate-900/30 p-4 rounded-lg border border-slate-200 dark:border-slate-800">
                     <div className="flex items-center gap-2 mb-3 text-blue-600 dark:text-blue-400">
                         <Shield className="w-5 h-5" />
-                        <h4 className="font-bold text-sm uppercase tracking-wide">Znak Wodny Audio (Demo Maker)</h4>
+                        <h4 className="font-bold text-sm uppercase tracking-wide">Audio Watermark (Demo Maker)</h4>
                     </div>
-                    
+
                     <p className="text-xs text-slate-500 mb-3">
-                        Wygeneruj bezpieczną wersję DEMO z nałożonym sygnałem ostrzegawczym co 30 sekund. Idealne do wysyłania klientom.
+                        Generate a secure DEMO version with warning signal overlay every 30 seconds. Perfect for sending to clients.
                     </p>
-                    
+
                     {!watermarkUrl ? (
                         <Button onClick={handleGenerateWatermark} disabled={isWatermarking || !file} size="sm" variant="secondary" className="w-full">
-                             {isWatermarking ? (
-                                    <>
-                                        <div className="w-4 h-4 border-2 border-slate-500 border-t-transparent rounded-full animate-spin" /> Przetwarzanie Audio...
-                                    </>
-                                ) : (
-                                    <>
-                                        <Shield className="w-4 h-4" /> Generuj Wersję Demo
-                                    </>
-                                )}
+                            {isWatermarking ? (
+                                <>
+                                    <div className="w-4 h-4 border-2 border-slate-500 border-t-transparent rounded-full animate-spin" /> Processing Audio...
+                                </>
+                            ) : (
+                                <>
+                                    <Shield className="w-4 h-4" /> Generate Demo Version
+                                </>
+                            )}
                         </Button>
                     ) : (
-                         <div className="flex gap-2 animate-fade-in">
-                            <button 
+                        <div className="flex gap-2 animate-fade-in">
+                            <button
                                 onClick={togglePreview}
                                 className="flex-1 flex items-center justify-center gap-2 py-2 px-4 bg-slate-200 dark:bg-slate-700 rounded-lg text-sm font-semibold hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors"
                             >
                                 {isPlayingWatermark ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-                                Podsłuch
+                                Preview
                             </button>
-                            <button 
+                            <button
                                 onClick={handleDownloadWatermark}
                                 className="flex-1 flex items-center justify-center gap-2 py-2 px-4 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors"
                             >
                                 <DownloadCloud className="w-4 h-4" /> WAV
                             </button>
-                         </div>
+                        </div>
                     )}
-                 </div>
+                </div>
             </div>
         </Card>
     );

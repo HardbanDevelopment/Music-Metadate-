@@ -20,7 +20,7 @@ const writeId3ToWav = async (originalWavFile: File, id3TagBlob: Blob): Promise<B
     const waveHeader = String.fromCharCode(...new Uint8Array(originalBuffer.slice(8, 12)));
 
     if (riffHeader !== 'RIFF' || waveHeader !== 'WAVE') {
-        throw new Error("Nieprawidłowy format pliku WAV.");
+        throw new Error("Invalid WAV file format.");
     }
 
     // 2. Prepare new chunk data
@@ -86,7 +86,7 @@ export const embedMetadata = async (
     const isWav = originalFile.type === 'audio/wav' || originalFile.name.toLowerCase().endsWith('.wav');
 
     if (!isMp3 && !isWav) {
-        throw new Error("Tagowanie jest obecnie obsługiwane dla plików MP3 oraz WAV.");
+        throw new Error("Tagging is currently supported for MP3 and WAV files.");
     }
 
     try {

@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Request
+from fastapi import APIRouter
 from app.config import settings
 import httpx
 
 router = APIRouter()
+
 
 @router.get("/proxy/discogs/release")
 async def get_discogs_release(release_id: str):
@@ -11,7 +12,6 @@ async def get_discogs_release(release_id: str):
     }
     async with httpx.AsyncClient() as client:
         response = await client.get(
-            f"https://api.discogs.com/releases/{release_id}",
-            headers=headers
+            f"https://api.discogs.com/releases/{release_id}", headers=headers
         )
     return response.json()

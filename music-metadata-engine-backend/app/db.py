@@ -1,13 +1,19 @@
 from sqlalchemy import create_engine, Column, Integer, String, DateTime
 from sqlalchemy.types import JSON
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import DeclarativeBase, sessionmaker
 import os
 
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./test.db")
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False} if "sqlite" in DATABASE_URL else {})
+engine = create_engine(
+    DATABASE_URL,
+    connect_args={"check_same_thread": False} if "sqlite" in DATABASE_URL else {},
+)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-Base = declarative_base()
+
+# Use SQLAlchemy 2.0 DeclarativeBase instead of deprecated declarative_base
+class Base(DeclarativeBase):
+    pass
+
 
 # Example model for analysis history
 class AnalysisHistory(Base):
@@ -17,5 +23,6 @@ class AnalysisHistory(Base):
     file_name = Column(String)
     result = Column(JSON)
     timestamp = Column(DateTime)
+
 
 Base.metadata.create_all(bind=engine)
