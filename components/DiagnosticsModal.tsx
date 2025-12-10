@@ -16,7 +16,6 @@ const DiagnosticsModal: React.FC<DiagnosticsModalProps> = ({ onClose }) => {
             frontend: {
                 userAgent: navigator.userAgent,
                 time: new Date().toISOString(),
-                time: new Date().toISOString(),
             },
             backend: {
                 connected: false,
