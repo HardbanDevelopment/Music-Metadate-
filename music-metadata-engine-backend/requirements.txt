@@ -16,7 +16,7 @@ email-validator
 
 # === AI / LLM ===
 groq
-openai-whisper
+# openai-whisper  # Too heavy for Vercel (>2GB), use external API
 google-generativeai
 
 # === Core Audio Analysis (librosa, madmom, pyAudioAnalysis) ===
@@ -33,13 +33,13 @@ mutagen
 tinytag
 
 # === Stem Separation ===
-spleeter
+# spleeter  # Conflicts with httpx and too heavy for Vercel
 
 # === Audio Embeddings ===
 # openl3  # Uncomment if needed - requires TensorFlow
 
 # === Pitch Detection ===
-crepe
+# crepe  # Too heavy for Vercel
 
 # === Loudness ===
 pyloudnorm
