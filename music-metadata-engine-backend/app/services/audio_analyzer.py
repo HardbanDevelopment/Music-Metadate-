@@ -197,15 +197,15 @@ class AdvancedAudioAnalyzer:
             gain_needed = target_lufs - loudness if not np.isinf(loudness) else 0
 
             return {
-                "lufs": round(loudness, 2) if not np.isinf(loudness) else None,
+                "lufs": round(float(loudness), 2) if not np.isinf(loudness) else None,
                 "true_peak_db": (
-                    round(true_peak_db, 2) if not np.isinf(true_peak_db) else None
+                    round(float(true_peak_db), 2) if not np.isinf(true_peak_db) else None
                 ),
-                "loudness_range_lu": round(loudness_range, 2),
+                "loudness_range_lu": round(float(loudness_range), 2),
                 "normalization": {
                     "target_lufs": target_lufs,
-                    "gain_needed_db": round(gain_needed, 2),
-                    "is_compliant": abs(gain_needed) < 1,
+                    "gain_needed_db": round(float(gain_needed), 2),
+                    "is_compliant": bool(abs(gain_needed) < 1),
                 },
             }
         except Exception as e:

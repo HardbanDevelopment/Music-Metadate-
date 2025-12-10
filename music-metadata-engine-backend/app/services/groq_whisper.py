@@ -251,11 +251,25 @@ Return ONLY valid JSON matching this structure:
 
         # Step 3: AI Metadata
         logger.info("Generating metadata with Groq...")
-        metadata = await GroqWhisperService.generate_metadata(
-            audio_analysis=audio_analysis,
-            transcription=transcription,
-            existing_metadata=audio_analysis.get("existing_metadata"),
-        )
+        try:
+            metadata = await GroqWhisperService.generate_metadata(
+                audio_analysis=audio_analysis,
+                transcription=transcription,
+                existing_metadata=audio_analysis.get("existing_metadata"),
+            )
+        except Exception as e:
+            logger.error(f"Metadata generation failed: {e}")
+            # Fallback to local data
+            core = audio_analysis.get("core", {})
+            metadata = {
+                "title": "Analysis (Partial)",
+                "artist": "Unknown",
+                "bpm": core.get("bpm"),
+                "key": core.get("key"),
+                "mode": core.get("mode"),
+                "error": f"AI Metadata generation failed: {str(e)}",
+                "_note": "Returned partial local analysis due to AI error.",
+            }
 
         # Combine all results
         return {
