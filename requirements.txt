@@ -16,9 +16,10 @@ email-validator
 
 # === AI / LLM ===
 groq
-# openai-whisper  # Too heavy for Vercel (>2GB), use external API
+openai-whisper
 google-generativeai
 
+# === Core Audio Analysis (librosa, madmom, pyAudioAnalysis) ===
 # === Core Audio Analysis (librosa, madmom, pyAudioAnalysis) ===
 librosa
 numpy
@@ -39,7 +40,7 @@ tinytag
 # openl3  # Uncomment if needed - requires TensorFlow
 
 # === Pitch Detection ===
-# crepe  # Too heavy for Vercel
+crepe
 
 # === Loudness ===
 pyloudnorm

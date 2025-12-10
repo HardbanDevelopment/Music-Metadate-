@@ -1,0 +1,15 @@
+node_modules
+music-metadata-engine-backend/__pycache__
+music-metadata-engine-backend/.venv
+.venv
+dist
+.git
+.env
+music-metadata-engine-backend/.env
+fine_tuning_mood_model
+playwright-report
+test-results
+artifacts
+logs
+items-*.json
+coverage
