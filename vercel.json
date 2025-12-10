@@ -3,75 +3,75 @@
     "rewrites": [
         {
             "source": "/health",
-            "destination": "/music-metadata-engine-backend/app/main.py"
+            "destination": "/api/index.py"
         },
         {
             "source": "/mir/:match*",
-            "destination": "/music-metadata-engine-backend/app/main.py"
+            "destination": "/api/index.py"
         },
         {
             "source": "/spotify/:match*",
-            "destination": "/music-metadata-engine-backend/app/main.py"
+            "destination": "/api/index.py"
         },
         {
             "source": "/lastfm/:match*",
-            "destination": "/music-metadata-engine-backend/app/main.py"
+            "destination": "/api/index.py"
         },
         {
             "source": "/discogs/:match*",
-            "destination": "/music-metadata-engine-backend/app/main.py"
+            "destination": "/api/index.py"
         },
         {
             "source": "/audd/:match*",
-            "destination": "/music-metadata-engine-backend/app/main.py"
+            "destination": "/api/index.py"
         },
         {
             "source": "/auth/:match*",
-            "destination": "/music-metadata-engine-backend/app/main.py"
+            "destination": "/api/index.py"
         },
         {
             "source": "/history/:match*",
-            "destination": "/music-metadata-engine-backend/app/main.py"
+            "destination": "/api/index.py"
         },
         {
             "source": "/quota/:match*",
-            "destination": "/music-metadata-engine-backend/app/main.py"
+            "destination": "/api/index.py"
         },
         {
             "source": "/batch/:match*",
-            "destination": "/music-metadata-engine-backend/app/main.py"
+            "destination": "/api/index.py"
         },
         {
             "source": "/tagging",
-            "destination": "/music-metadata-engine-backend/app/main.py"
+            "destination": "/api/index.py"
         },
         {
             "source": "/tagging/:match*",
-            "destination": "/music-metadata-engine-backend/app/main.py"
+            "destination": "/api/index.py"
         },
         {
             "source": "/ddex/:match*",
-            "destination": "/music-metadata-engine-backend/app/main.py"
+            "destination": "/api/index.py"
         },
         {
             "source": "/analysis/:match*",
-            "destination": "/music-metadata-engine-backend/app/main.py"
+            "destination": "/api/index.py"
         },
         {
             "source": "/generate/:match*",
-            "destination": "/music-metadata-engine-backend/app/main.py"
+            "destination": "/api/index.py"
         },
         {
             "source": "/proxy/:match*",
-            "destination": "/music-metadata-engine-backend/app/main.py"
+            "destination": "/api/index.py"
         },
         {
             "source": "/docs",
-            "destination": "/music-metadata-engine-backend/app/main.py"
+            "destination": "/api/index.py"
         },
         {
             "source": "/openapi.json",
-            "destination": "/music-metadata-engine-backend/app/main.py"
+            "destination": "/api/index.py"
         },
         {
             "source": "/([^.]*)",
