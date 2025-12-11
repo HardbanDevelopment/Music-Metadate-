@@ -6,36 +6,36 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, '.', '');
   return {
     server: {
-      port: 3000,
+      port: 3001,
       host: '0.0.0.0',
       proxy: {
         '/health': {
-          target: 'http://127.0.0.1:8000',
+          target: 'http://127.0.0.1:8001',
           changeOrigin: true,
           secure: false,
         },
         '/mir': {
-          target: 'http://127.0.0.1:8000',
+          target: 'http://127.0.0.1:8001',
           changeOrigin: true,
           secure: false,
         },
         '/history': {
-          target: 'http://127.0.0.1:8000',
+          target: 'http://127.0.0.1:8001',
           changeOrigin: true,
           secure: false,
         },
         '/analysis': {
-          target: 'http://127.0.0.1:8000',
+          target: 'http://127.0.0.1:8001',
           changeOrigin: true,
           secure: false,
         },
         '/generate': {
-          target: 'http://127.0.0.1:8000',
+          target: 'http://127.0.0.1:8001',
           changeOrigin: true,
           secure: false,
         },
         '/auth': {
-          target: 'http://127.0.0.1:8000',
+          target: 'http://127.0.0.1:8001',
           changeOrigin: true,
           secure: false,
         }

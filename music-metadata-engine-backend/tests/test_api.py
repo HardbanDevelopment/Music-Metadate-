@@ -7,4 +7,4 @@ async def test_health_check(client: AsyncClient):
     response = await client.get("/")
     assert response.status_code == 200
     json_data = response.json()
-    assert json_data.get("message") == "Music Metadata Engine Backend is running."
+    assert json_data.get("message") == "Music Metadata Engine Backend is running"

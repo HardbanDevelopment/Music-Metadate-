@@ -71,8 +71,8 @@ class AdvancedAudioAnalyzer:
         librosa = get_librosa()
 
         try:
-            # Load audio (first 120s for performance)
-            y, sr = librosa.load(file_path, duration=120)
+            # Load audio (full duration for accuracy)
+            y, sr = librosa.load(file_path, duration=None)
 
             # === BPM & Beat Detection ===
             tempo, beat_frames = librosa.beat.beat_track(y=y, sr=sr)
@@ -119,12 +119,30 @@ class AdvancedAudioAnalyzer:
             mfcc = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=13)
             mfcc_mean = [float(x) for x in np.mean(mfcc, axis=1)]
 
+            # === Heuristic Mood Detection ===
+            detected_moods = []
+            if energy_mean > 0.1 and bpm > 120:
+                detected_moods.append("Energetic")
+            if energy_mean < 0.05 and bpm < 100:
+                detected_moods.append("Calm")
+            if mode == "Major" and bpm > 110:
+                detected_moods.append("Happy")
+            if mode == "Minor" and bpm < 110:
+                detected_moods.append("Melancholic")
+            if danceability > 1.2:  # Assuming arbitrary threshold for high danceability
+                detected_moods.append("Danceable")
+            if spectral_centroid < 1500:
+                detected_moods.append("Dark")
+            if spectral_centroid > 3500:
+                detected_moods.append("Bright")
+
             return {
                 "bpm": round(bpm, 1),
                 "key": detected_key,
                 "mode": mode,
                 "full_key": f"{detected_key} {mode}",
                 "duration_seconds": round(duration, 2),
+                "moods": detected_moods, 
                 "spectral": {
                     "centroid": round(spectral_centroid, 2),
                     "rolloff": round(spectral_rolloff, 2),
@@ -222,7 +240,9 @@ class AdvancedAudioAnalyzer:
             crepe = get_crepe()
             sf = get_soundfile()
 
-            audio, sr = sf.read(file_path)
+            # Limit to 60 seconds for performance on CPU
+            # CREPE is extremely heavy; full track would take hours.
+            audio, sr = sf.read(file_path, stop=16000 * 60)
 
             # CREPE expects mono
             if len(audio.shape) > 1:
@@ -375,10 +395,10 @@ class AdvancedAudioAnalyzer:
             results["loudness"] = {"error": str(e)}
 
         # Pitch (optional, can be slow)
-        # try:
-        #     results["pitch"] = await AdvancedAudioAnalyzer.analyze_pitch(file_path)
-        # except Exception as e:
-        #     results["pitch"] = {"error": str(e)}
+        try:
+            results["pitch"] = await AdvancedAudioAnalyzer.analyze_pitch(file_path)
+        except Exception as e:
+            results["pitch"] = {"error": str(e)}
 
         # Existing metadata
         try:

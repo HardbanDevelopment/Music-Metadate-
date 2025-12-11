@@ -1,0 +1,11 @@
+
+__pycache__
+venv/
+.env
+.git
+.pytest_cache
+.vscode
+*.pyc
+temp_*
+test*.mp3
+music_metadata.db

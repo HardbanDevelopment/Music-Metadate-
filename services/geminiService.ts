@@ -13,10 +13,21 @@ const getAuthToken = (): string | null => {
     }
 };
 
+// API Base URL configuration
+// In development (local): uses proxy defined in vite.config.ts (relative path)
+// In production (Vercel): points to Hugging Face Backend URL defined in env vars
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+
 // Generic POST function for our backend
 const post = async <T>(url: string, body: any, isFormData: boolean = false): Promise<T> => {
     const token = getAuthToken();
     const headers: HeadersInit = {};
+
+    // Use full URL (Base + Endpoint)
+    const fullUrl = `${API_BASE_URL}${url}`;
+
+    // Debug log for production troubleshooting
+    if (API_BASE_URL) console.log(`Making request to: ${fullUrl}`);
 
     if (!token) {
         // Handle case where user is not logged in, if required by the endpoint
@@ -208,7 +219,9 @@ export const generateMetadata = async (
 
         // Use the post helper but for formData we need to handle it slightly differently
         // or just use fetch directly since we are sending a file
-        const response = await fetch('/analysis/generate', {
+        const fullUrl = `${API_BASE_URL}/analysis/generate`;
+
+        const response = await fetch(fullUrl, {
             method: 'POST',
             body: formData,
             // Header for auth if needed, but for now assuming local dev

@@ -106,34 +106,39 @@ AUDIO ANALYSIS DATA (from local analysis):
 - LUFS: {loudness.get('lufs', 'unknown')}
 """
 
-            # Helper to safely sanitize strings to ASCII
-            def safe_ascii(val):
+            # Helper to safely sanitize strings for LOGGING/PROMPT (force ASCII to prevent crashes)
+            def safe_str(val):
                 if val is None:
                     return ""
                 try:
-                    return str(val).encode("ascii", "replace").decode("ascii")
-                except Exception as e:
-                    logger.error(f"DEBUG: safe_ascii failed for {val}: {e}")
+                    s = str(val)
+                    # Force ASCII to prevent UnicodeEncodeError on Windows envs or libraries
+                    return s.encode("ascii", "ignore").decode("ascii")
+                except:
                     return "unknown"
 
             logger.info("DEBUG: Building transcription context")
             transcription_context = ""
             if transcription:
-                safe_transcription = safe_ascii(transcription[:2000])
                 transcription_context = f"""
 LYRICS/VOCALS (transcribed):
-{safe_transcription}
+{safe_str(transcription)[:3000]}
 """
 
             logger.info("DEBUG: Building existing metadata context")
             existing_context = ""
             if existing_metadata:
+                titles = safe_str(existing_metadata.get('title'))
+                artists = safe_str(existing_metadata.get('artist'))
+                albums = safe_str(existing_metadata.get('album'))
+                genres = safe_str(existing_metadata.get('genre'))
+                
                 existing_context = f"""
 EXISTING FILE METADATA:
-- Title: {safe_ascii(existing_metadata.get('title'))}
-- Artist: {safe_ascii(existing_metadata.get('artist'))}
-- Album: {safe_ascii(existing_metadata.get('album'))}
-- Genre: {safe_ascii(existing_metadata.get('genre'))}
+- Title: {titles}
+- Artist: {artists}
+- Album: {albums}
+- Genre: {genres}
 """
 
             logger.info("DEBUG: Constructing Prompt string")
@@ -172,21 +177,16 @@ Return ONLY valid JSON matching this structure:
                 logger.error(f"DEBUG: Prompt construction failed: {e}")
                 raise
 
-            # Sanitize the entire prompt to ASCII
-            def sanitize_to_ascii(text: str) -> str:
-                try:
-                    return text.encode("ascii", "replace").decode("ascii")
-                except Exception as e:
-                    logger.error(f"DEBUG: sanitize_to_ascii failed: {e}")
-                    return text.encode("ascii", "ignore").decode("ascii")
+            # For Groq API, we can send UTF-8. No need to force ASCII.
+            # But we must be careful if we verify it.
+            prompt_safe = prompt 
 
-            logger.info("DEBUG: Sanitizing prompt")
-            prompt_safe = sanitize_to_ascii(prompt)
+            logger.info("DEBUG: Sending prompt to Groq (length: %d)", len(prompt_safe))
 
             # Call Groq API
             logger.info("DEBUG: Calling Groq API")
             response = client.chat.completions.create(
-                model="llama3-70b-8192",  # Fast, capable, free
+                model="llama-3.3-70b-versatile",  # Updated to latest Llama 3.3
                 messages=[
                     {
                         "role": "system",
@@ -258,7 +258,9 @@ Return ONLY valid JSON matching this structure:
                 existing_metadata=audio_analysis.get("existing_metadata"),
             )
         except Exception as e:
-            logger.error(f"Metadata generation failed: {e}")
+            import traceback
+            error_trace = traceback.format_exc()
+            logger.error(f"Metadata generation failed: {error_trace}")
             # Fallback to local data
             core = audio_analysis.get("core", {})
             metadata = {
@@ -268,6 +270,7 @@ Return ONLY valid JSON matching this structure:
                 "key": core.get("key"),
                 "mode": core.get("mode"),
                 "error": f"AI Metadata generation failed: {str(e)}",
+                "trace": error_trace,
                 "_note": "Returned partial local analysis due to AI error.",
             }
 

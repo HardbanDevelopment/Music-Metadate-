@@ -74,6 +74,15 @@ async def generate_analysis(
                 metadata["technical"] = core.get("spectral", {})
                 metadata["technical"]["rhythm"] = core.get("rhythm", {})
                 metadata["technical"]["energy"] = core.get("energy", {})
+                
+                # Merge heuristic moods if AI didn't return any
+                if not metadata.get("moods"):
+                    metadata["moods"] = core.get("moods", [])
+                else:
+                    # Optional: Unique merge if you want both
+                    current_moods = set(metadata.get("moods", []))
+                    heuristic_moods = set(core.get("moods", []))
+                    metadata["moods"] = list(current_moods.union(heuristic_moods))
 
             if "loudness" in analysis and "error" not in analysis["loudness"]:
                 metadata["loudness"] = analysis["loudness"]
@@ -110,7 +119,7 @@ async def generate_analysis(
                 "key": core.get("key"),
                 "mode": core.get("mode"),
                 "mainGenre": existing.get("genre") or "Unknown",
-                "moods": [],
+                "moods": core.get("moods", []),
                 "instrumentation": [],
                 "technical": core.get("spectral", {}),
                 "loudness": analysis.get("loudness", {}),
